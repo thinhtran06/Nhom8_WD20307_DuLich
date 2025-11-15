@@ -66,10 +66,12 @@
             font-size:14px;
             color:#555;
         }
+        
         .footer-links ul { list-style:none; display:flex; gap:15px; padding:0; }
         .footer-links a { text-decoration:none; color:#000; font-weight:500; }
         .footer-links a:hover { color:#0071c2; }
         .footer-bottom { text-align:center; margin-top:15px; }
+        
     </style>
 </head>
 <body>
