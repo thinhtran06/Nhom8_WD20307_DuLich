@@ -1,8 +1,12 @@
 <?php
+session_start();
+
+
 require_once __DIR__ . '/app/helpers.php';
 require_once __DIR__ . '/app/Controllers/UserController.php';
 require_once __DIR__ . '/app/Controllers/AdminController.php';
 require_once __DIR__ . '/app/Controllers/HdvController.php';
+require_once __DIR__ . '/app/Controllers/AuthController.php';
 
 $page = $_GET['page'] ?? 'home';
 $action = $_GET['action'] ?? 'index';
@@ -52,11 +56,17 @@ switch($page){
         break;
 
     // ===== Login =====
-    case 'login':
-        if($action == 'index') {
-            include __DIR__ . '/views/auth/login.php';
-        }
-        break;
+   case 'login':
+    $auth = new AuthController();
+
+    if ($action == 'loginForm' || $action == 'index') {
+        $auth->loginForm();
+    } elseif ($action == 'checkLogin') {
+        $auth->checkLogin();
+    } elseif ($action == 'logout') {
+        $auth->logout();
+    }
+    break;
    case 'register':
     $controller = new UserController();
     if ($action == 'index') {

@@ -76,16 +76,23 @@
 <div class="wrapper">
 <header>
     <h2>Web Du Lịch</h2>
-   <nav>
-    <ul>
-        <li><a href="index.php?page=home">Trang chủ</a></li>
-        <li><a href="index.php?page=user&action=list">Tour</a></li>
-          <li><a href="index.php?page=user&action=showBookingPage">Đặt tour</a></li>
-  <li><a href="index.php?page=user&action=contact">Liên hệ</a></li>
-<li><a href="index.php?page=login&action=index">Đăng nhập</a></li>
+<nav>
+        <ul>
+            <li><a href="index.php?page=home">Trang chủ</a></li>
+            <li><a href="index.php?page=user&action=list">Tour</a></li>
+            <li><a href="index.php?page=user&action=showBookingPage">Đặt tour</a></li>
+            <li><a href="index.php?page=user&action=contact">Liên hệ</a></li>
 
-    </ul>
-</nav>
+            <?php if (isset($_SESSION['user'])): ?>
+                <li>Xin chào, <?= htmlspecialchars($_SESSION['user']['name']) ?></li>
+                <li><a href="index.php?page=login&action=logout">Đăng xuất</a></li>
+            <?php else: ?>
+                <li><a href="index.php?page=login&action=loginForm">Đăng nhập</a></li>
+                <li><a href="index.php?page=register&action=index">Đăng ký</a></li>
+            <?php endif; ?>
+        </ul>
+    </nav>
+
 
 </header>
 <main>
