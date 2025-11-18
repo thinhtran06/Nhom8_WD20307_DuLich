@@ -1,21 +1,24 @@
-<?php
-// app/Controllers/AdminController.php
-
-require_once __DIR__ . '/../models/Tour.php';
-require_once __DIR__ . '/../models/Booking.php';
-
+<?php 
 class AdminController {
 
-    // Hiển thị danh sách tour
+    private function checkAdmin() {
+        session_start();
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+            header("Location: index.php?page=login");
+            exit();
+        }
+    }
+
     public function tourList() {
+        $this->checkAdmin(); // kiểm tra quyền admin
         $tours = Tour::all();
         include __DIR__ . '/../../views/layouts/header.php';
         include __DIR__ . '/../../views/admin/tours/list.php';
         include __DIR__ . '/../../views/layouts/footer.php';
     }
 
-    // Thêm tour mới
     public function tourAdd() {
+        $this->checkAdmin();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Tour::create($_POST);
             header("Location: index.php?page=admin_tours&action=list");
@@ -26,16 +29,16 @@ class AdminController {
         include __DIR__ . '/../../views/layouts/footer.php';
     }
 
-    // Hiển thị danh sách booking
     public function bookingList() {
+        $this->checkAdmin();
         $bookings = Booking::all();
         include __DIR__ . '/../../views/layouts/header.php';
         include __DIR__ . '/../../views/admin/bookings/list.php';
         include __DIR__ . '/../../views/layouts/footer.php';
     }
 
-    // Thêm booking mới
     public function bookingAdd() {
+        $this->checkAdmin();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Booking::create($_POST);
             header("Location: index.php?page=admin_bookings&action=list");
