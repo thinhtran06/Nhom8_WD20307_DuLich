@@ -1,14 +1,27 @@
-<!-- views/admin/tours/list.php -->
-<h2>Danh sách tour</h2>
-<a href="index.php?page=admin_tours&action=add">Thêm tour mới</a>
-<table border="1">
-<tr><th>ID</th><th>Tên</th><th>Loại</th><th>Giá</th></tr>
-<?php foreach($tours as $t): ?>
-<tr>
-    <td><?= $t['id'] ?></td>
-    <td><?= $t['name'] ?></td>
-    <td><?= $t['type'] ?></td>
-    <td><?= $t['price'] ?></td>
-</tr>
-<?php endforeach; ?>
-</table>
+<main class="site-content">
+    <div class="hero">
+        <h2>Khám phá những tour hấp dẫn</h2>
+        <p>Đặt tour nhanh chóng và tiện lợi.</p>
+    </div>
+
+    <div class="container">
+        <h3>Danh sách tour</h3>
+        <div class="tour-grid">
+            <?php 
+            // Giả lập dữ liệu tour, sau này lấy từ DB
+            $tours = [
+                ['name'=>'Tour Hà Nội - Hạ Long', 'desc'=>'3 ngày 2 đêm, tham quan Vịnh Hạ Long', 'img'=>'https://via.placeholder.com/300x150'],
+                ['name'=>'Tour Đà Nẵng - Hội An', 'desc'=>'4 ngày 3 đêm, khám phá phố cổ Hội An', 'img'=>'https://via.placeholder.com/300x150'],
+                ['name'=>'Tour Sài Gòn - Cần Thơ', 'desc'=>'3 ngày 2 đêm, trải nghiệm chợ nổi Cần Thơ', 'img'=>'https://via.placeholder.com/300x150']
+            ];
+            foreach($tours as $tour): ?>
+            <div class="tour-card">
+                <img src="<?= $tour['img'] ?>" alt="<?= $tour['name'] ?>">
+                <h4><?= $tour['name'] ?></h4>
+                <p><?= $tour['desc'] ?></p>
+                <a href="#" class="btn-primary">Đặt tour</a>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</main>

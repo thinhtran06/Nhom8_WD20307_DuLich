@@ -76,14 +76,16 @@
 <div class="wrapper">
 <header>
     <h2>Web Du Lịch</h2>
-    <nav>
-        <ul>
-            <li><a href="index.php">Trang chủ</a></li>
-            <li><a href="index.php?page=admin_tours&action=list">Tour</a></li>
-            <li><a href="index.php?page=admin_bookings&action=list">Booking</a></li>
-            <li><a href="#">Liên hệ</a></li>
-            <li><a href="#">Đăng nhập</a></li>
-        </ul>
-    </nav>
+   <nav>
+    <ul>
+        <li><a href="index.php?page=home">Trang chủ</a></li>
+        <li><a href="index.php?page=user&action=list">Tour</a></li>
+
+        <li><a href="index.php?page=user_bookings&action=index">Booking</a></li>
+        <li><a href="index.php?page=contact&action=index">Liên hệ</a></li>
+        <li><a href="index.php?page=login&action=index">Đăng nhập</a></li>
+    </ul>
+</nav>
+
 </header>
 <main>

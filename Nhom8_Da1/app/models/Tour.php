@@ -1,17 +1,19 @@
 <?php
-// app/Models/Tour.php
 require_once __DIR__ . '/../../config/database.php';
 
 class Tour {
-    public static function all(){
-        $db = Database::getConnection();
-        $stmt = $db->query("SELECT * FROM tours");
+
+    public static function all() {
+        $pdo = Database::getConnection();
+        $stmt = $pdo->query("SELECT * FROM tours");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function create($data){
-        $db = Database::getConnection();
-        $stmt = $db->prepare("INSERT INTO tours (name,type,description,price,policy,supplier) VALUES (?,?,?,?,?,?)");
-        $stmt->execute([$data['name'],$data['type'],$data['description'],$data['price'],$data['policy'],$data['supplier']]);
+    public static function find($id) {
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM tours WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+    
 }
