@@ -1,6 +1,4 @@
 <?php
-// index.php
-
 require_once __DIR__ . '/app/helpers.php';
 require_once __DIR__ . '/app/Controllers/UserController.php';
 require_once __DIR__ . '/app/Controllers/AdminController.php';
@@ -9,9 +7,7 @@ require_once __DIR__ . '/app/Controllers/HdvController.php';
 $page = $_GET['page'] ?? 'home';
 $action = $_GET['action'] ?? 'index';
 
-/**
- * Hàm render view kèm header và footer
- */
+// Hàm render view từ ngoài class (dùng cho home)
 function renderView($view, $data = []) {
     extract($data);
     include __DIR__ . '/views/layouts/header.php';
@@ -19,19 +15,26 @@ function renderView($view, $data = []) {
     include __DIR__ . '/views/layouts/footer.php';
 }
 
-/**
- * Router
- */
+// Router
 switch($page){
     // ===== User =====
     case 'user':
         $controller = new UserController();
-        if($action == 'index' || $action == 'list') {
+
+        if ($action == 'index' || $action == 'list') {
             $controller->tourList();
-        } elseif($action == 'book') {
-            $controller->bookTour();
-        } elseif($action == 'detail') {
+        } elseif ($action == 'detail') {
             $controller->tourDetail();
+        } elseif ($action == 'showBookingPage') {
+            $controller->showBookingPage();
+        } elseif ($action == 'book') {
+            $controller->bookTour();
+        } elseif ($action == 'saveBooking') {
+            $controller->saveBooking();
+        } elseif ($action == 'contact') {
+            $controller->contact();
+        } elseif ($action == 'sendContact') {
+            $controller->sendContact();
         }
         break;
 
@@ -48,11 +51,22 @@ switch($page){
         if($action == 'add') $controller->bookingAdd();
         break;
 
-    // ===== HDV =====
-    case 'hdv_schedule':
-        $controller = new HdvController();
-        $controller->viewSchedule();
+    // ===== Login =====
+    case 'login':
+        if($action == 'index') {
+            include __DIR__ . '/views/auth/login.php';
+        }
         break;
+   case 'register':
+    $controller = new UserController();
+    if ($action == 'index') {
+        $controller->register();
+    } elseif ($action == 'saveRegister') {
+        $controller->register();
+    }
+    break;
+
+    
 
     // ===== Trang chủ =====
     case 'home':

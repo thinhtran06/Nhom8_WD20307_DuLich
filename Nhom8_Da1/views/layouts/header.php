@@ -80,10 +80,10 @@
     <ul>
         <li><a href="index.php?page=home">Trang chủ</a></li>
         <li><a href="index.php?page=user&action=list">Tour</a></li>
+          <li><a href="index.php?page=user&action=showBookingPage">Đặt tour</a></li>
+  <li><a href="index.php?page=user&action=contact">Liên hệ</a></li>
+<li><a href="index.php?page=login&action=index">Đăng nhập</a></li>
 
-        <li><a href="index.php?page=user_bookings&action=index">Booking</a></li>
-        <li><a href="index.php?page=contact&action=index">Liên hệ</a></li>
-        <li><a href="index.php?page=login&action=index">Đăng nhập</a></li>
     </ul>
 </nav>
 
