@@ -10,6 +10,19 @@
         .container { max-width: 1200px; }
         h1, h2 { color: #2c3e50; margin-bottom: 20px; }
         .alert { margin-bottom: 20px; }
+        
+        /* Bổ sung/Chỉnh sửa CSS (Giữ nguyên các style khác) */
+        .sidebar {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            width: 250px;
+            height: calc(100vh - 56px);
+            z-index: 100;
+        }
+        /* ... các style khác ... */
+        
+        /* Đảm bảo style sidebar và submenu đã được định nghĩa trong code gốc */
     </style>
 </head>
 <body>
@@ -20,25 +33,62 @@
 <nav class="col-md-2 d-none d-md-block bg-light sidebar">
     <div class="sidebar-sticky">
         <ul class="nav flex-column">
-            <!-- Dashboard -->
             <li class="nav-item">
                 <a class="nav-link <?php echo (!isset($_GET['action']) || $_GET['action'] == 'dashboard') ? 'active' : ''; ?>" 
-                   href="index.php?action=dashboard">
+                    href="index.php?action=dashboard">
                     📊 Dashboard
                 </a>
             </li>
             
-            <!-- Quản Lý Tour với Submenu -->
+            <?php 
+                $isCategoryActive = (isset($_GET['category']) && (
+                                    $_GET['category'] == 'domestic' || 
+                                    $_GET['category'] == 'international'));
+            ?>
+            <li class="nav-item">
+                <a class="nav-link menu-toggle <?php echo $isCategoryActive ? 'active' : ''; ?>" 
+                    href="#categorySubmenu" data-toggle="collapse" aria-expanded="<?php echo $isCategoryActive ? 'true' : 'false'; ?>">
+                    📁 Quản Lý Danh Mục
+                    <span class="arrow">▼</span>
+                </a>
+                <ul class="collapse submenu <?php echo $isCategoryActive ? 'show' : ''; ?>" id="categorySubmenu">
+                    <li>
+                        <a href="index.php?action=tour_index&category=domestic" class="<?php echo (isset($_GET['category']) && $_GET['category'] == 'domestic') ? 'active' : ''; ?>">
+                            🇻🇳 Tour Trong Nước
+                        </a>
+                    </li>
+                    <li>
+                        <a href="index.php?action=tour_index&category=international" class="<?php echo (isset($_GET['category']) && $_GET['category'] == 'international') ? 'active' : ''; ?>">
+                            🌐 Tour Ngoài Nước
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'booking_') === 0) ? 'active' : ''; ?>" 
+                    href="index.php?action=booking_index">
+                    🎫 Quản Lý Đặt Chỗ
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'hdv_') === 0) ? 'active' : ''; ?>" 
+                    href="index.php?action=hdv_index">
+                    👨‍💼 Quản Lý Hướng Dẫn Viên
+                </a>
+            </li>
+            
             <li class="nav-item">
                 <a class="nav-link menu-toggle <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'tour_') === 0) ? 'active' : ''; ?>" 
-                   href="#tourSubmenu" data-toggle="collapse" aria-expanded="<?php echo (isset($_GET['action']) && strpos($_GET['action'], 'tour_') === 0) ? 'true' : 'false'; ?>">
+                    href="#tourSubmenu" data-toggle="collapse" aria-expanded="<?php echo (isset($_GET['action']) && strpos($_GET['action'], 'tour_') === 0) ? 'true' : 'false'; ?>">
                     🏖️ Quản Lý Tour
                     <span class="arrow">▼</span>
                 </a>
                 <ul class="collapse submenu <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'tour_') === 0) ? 'show' : ''; ?>" id="tourSubmenu">
                     <li>
-                        <a href="index.php?action=tour_index" class="<?php echo (isset($_GET['action']) && $_GET['action'] == 'tour_index') ? 'active' : ''; ?>">
-                            📋 Danh Sách Tour
+                        <a href="index.php?action=tour_index" class="<?php echo (isset($_GET['action']) && $_GET['action'] == 'tour_index' && !isset($_GET['category'])) ? 'active' : ''; ?>">
+                            📋 Danh Sách Tour (Chung)
                         </a>
                     </li>
                     <li>
@@ -59,16 +109,15 @@
                 </ul>
             </li>
             
-            <!-- Quản Lý Nhà Cung Cấp với Submenu -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'supplier_') === 0) ? 'active' : ''; ?>" 
-                   href="#supplierSubmenu" data-toggle="collapse" aria-expanded="<?php echo (isset($_GET['action']) && strpos($_GET['action'], 'supplier_') === 0) ? 'true' : 'false'; ?>">
+                    href="#supplierSubmenu" data-toggle="collapse" aria-expanded="<?php echo (isset($_GET['action']) && strpos($_GET['action'], 'supplier_') === 0) ? 'true' : 'false'; ?>">
                     🏢 Quản Lý Nhà Cung Cấp
                     <span class="arrow">▼</span>
                 </a>
                 <ul class="collapse submenu <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'supplier_') === 0) ? 'show' : ''; ?>" id="supplierSubmenu">
                     <li>
-                        <a href="index.php?action=supplier_index" class="<?php echo (isset($_GET['action']) && $_GET['action'] == 'supplier_index') ? 'active' : ''; ?>">
+                        <a href="index.php?action=supplier_index" class="<?php echo (isset($_GET['action']) && $_GET['action'] == 'supplier_index' && !isset($_GET['type'])) ? 'active' : ''; ?>">
                             📋 Danh Sách Nhà Cung Cấp
                         </a>
                     </li>
@@ -95,11 +144,10 @@
                 </ul>
             </li>
             
-            <!-- Quản Lý Tài Khoản (chỉ Admin) -->
             <?php if(isAdmin()): ?>
             <li class="nav-item">
                 <a class="nav-link menu-toggle <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'user_') === 0) ? 'active' : ''; ?>" 
-                   href="#userSubmenu" data-toggle="collapse" aria-expanded="<?php echo (isset($_GET['action']) && strpos($_GET['action'], 'user_') === 0) ? 'true' : 'false'; ?>">
+                    href="#userSubmenu" data-toggle="collapse" aria-expanded="<?php echo (isset($_GET['action']) && strpos($_GET['action'], 'user_') === 0) ? 'true' : 'false'; ?>">
                     👥 Quản Lý Tài Khoản
                     <span class="arrow">▼</span>
                 </a>
@@ -114,15 +162,13 @@
                             ➕ Thêm User Mới
                         </a>
                     </li>
-                
                 </ul>
             </li>
             <?php endif; ?>
             
-            <!-- Đăng Xuất -->
             <li class="nav-item">
                 <a class="nav-link" href="index.php?action=logout" 
-                   onclick="return confirm('Bạn có chắc muốn đăng xuất?')">
+                    onclick="return confirm('Bạn có chắc muốn đăng xuất?')">
                     🚪 Đăng Xuất
                 </a>
             </li>
