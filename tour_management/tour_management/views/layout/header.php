@@ -39,31 +39,37 @@
                     📊 Dashboard
                 </a>
             </li>
-            
-            <?php 
-                $isCategoryActive = (isset($_GET['category']) && (
-                                    $_GET['category'] == 'domestic' || 
-                                    $_GET['category'] == 'international'));
-            ?>
-            <li class="nav-item">
-                <a class="nav-link menu-toggle <?php echo $isCategoryActive ? 'active' : ''; ?>" 
-                    href="#categorySubmenu" data-toggle="collapse" aria-expanded="<?php echo $isCategoryActive ? 'true' : 'false'; ?>">
-                    📁 Quản Lý Danh Mục
-                    <span class="arrow">▼</span>
-                </a>
-                <ul class="collapse submenu <?php echo $isCategoryActive ? 'show' : ''; ?>" id="categorySubmenu">
-                    <li>
-                        <a href="index.php?action=tour_index&category=domestic" class="<?php echo (isset($_GET['category']) && $_GET['category'] == 'domestic') ? 'active' : ''; ?>">
-                            🇻🇳 Tour Trong Nước
-                        </a>
-                    </li>
-                    <li>
-                        <a href="index.php?action=tour_index&category=international" class="<?php echo (isset($_GET['category']) && $_GET['category'] == 'international') ? 'active' : ''; ?>">
-                            🌐 Tour Ngoài Nước
-                        </a>
-                    </li>
-                </ul>
-            </li>
+          <?php
+// Lấy action hiện tại từ URL
+$currentAction = $_GET['action'] ?? '';
+
+// Định nghĩa các action thuộc menu "Quản Lý Danh Mục"
+$categoryActions = ['tour_trong_nuoc', 'tour_ngoai_nuoc'];
+
+// Kiểm tra xem menu chính "Quản Lý Danh Mục" có đang active không
+$isCategoryActive = in_array($currentAction, $categoryActions);
+?>
+          <li class="nav-item">
+    <a class="nav-link menu-toggle <?php echo $isCategoryActive ? 'active' : ''; ?>" 
+       href="#categorySubmenu" data-toggle="collapse" aria-expanded="<?php echo $isCategoryActive ? 'true' : 'false'; ?>">
+        📁 Quản Lý Danh Mục
+        <span class="arrow">▼</span>
+    </a>
+    <ul class="collapse submenu <?php echo $isCategoryActive ? 'show' : ''; ?>" id="categorySubmenu">
+        <li>
+            <a href="index.php?action=tour_trong_nuoc" 
+               class="<?php echo ($currentAction == 'tour_trong_nuoc') ? 'active' : ''; ?>">
+                🇻🇳 Tour Trong Nước
+            </a>
+        </li>
+        <li>
+            <a href="index.php?action=tour_ngoai_nuoc" 
+               class="<?php echo ($currentAction == 'tour_ngoai_nuoc') ? 'active' : ''; ?>">
+                🌐 Tour Ngoài Nước
+            </a>
+        </li>
+        </ul>
+</li>
             
             <li class="nav-item">
                 <a class="nav-link menu-toggle <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'tour_') === 0) ? 'active' : ''; ?>" 

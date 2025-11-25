@@ -24,23 +24,27 @@ class TourController {
         require_once 'views/tours/create.php';
     }
 
-    // Xử lý tạo tour mới
+    // Xử lý tạo tour mới (ĐÃ CẬP NHẬT: THÊM loai_tour)
     public function store() {
         if($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->tour->ten_tour = $_POST['ten_tour'];
             $this->tour->mo_ta = $_POST['mo_ta'];
             $this->tour->diem_khoi_hanh = $_POST['diem_khoi_hanh'];
             $this->tour->diem_den = $_POST['diem_den'];
-            $this->tour->ngay_khoi_hanh = $_POST['ngay_khoi_hanh'];
+            
+            // >>> THÊM XỬ LÝ CHO TRƯỜNG LOẠI TOUR <<<
+            $this->tour->loai_tour = $_POST['loai_tour'] ?? 'Trong nước'; 
+            
+           $this->tour->ngay_khoi_hanh = $_POST['ngay_khoi_hanh'] ? $_POST['ngay_khoi_hanh'] : null;
             $this->tour->so_ngay = $_POST['so_ngay'];
             $this->tour->gia_tour = $_POST['gia_tour'];
             $this->tour->so_cho = $_POST['so_cho'];
             $this->tour->trang_thai = $_POST['trang_thai'];
             $this->tour->lich_trinh = $_POST['lich_trinh'] ?? null;
-
+            
             if($this->tour->create()) {
                header("Location: index.php?action=tour_index&message=Tạo tour thành công!");
-                exit();
+               exit();
             } else {
                 echo "Có lỗi xảy ra!";
             }
@@ -67,7 +71,7 @@ class TourController {
         }
     }
 
-    // Xử lý cập nhật tour
+    // Xử lý cập nhật tour (ĐÃ CẬP NHẬT: THÊM loai_tour)
     public function update($id) {
         if($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->tour->id = $id;
@@ -75,22 +79,26 @@ class TourController {
             $this->tour->mo_ta = $_POST['mo_ta'];
             $this->tour->diem_khoi_hanh = $_POST['diem_khoi_hanh'];
             $this->tour->diem_den = $_POST['diem_den'];
+            
+            // >>> THÊM XỬ LÝ CHO TRƯỜNG LOẠI TOUR <<<
+            $this->tour->loai_tour = $_POST['loai_tour'] ?? 'Trong nước';
+            
             $this->tour->ngay_khoi_hanh = $_POST['ngay_khoi_hanh'];
             $this->tour->so_ngay = $_POST['so_ngay'];
             $this->tour->gia_tour = $_POST['gia_tour'];
             $this->tour->so_cho = $_POST['so_cho'];
             $this->tour->trang_thai = $_POST['trang_thai'];
+            $this->tour->lich_trinh = $_POST['lich_trinh'] ?? null; // Cần thêm lại nếu thiếu
 
             if($this->tour->update()) {
                header("Location: index.php?action=tour_index&message=Cập nhật tour ID $id thành công!");
-                exit();
+               exit();
             } else {
                 echo "Có lỗi xảy ra!";
             }
         }
     }
-    // controllers/TourController.php (THÊM PHƯƠNG THỨC MỚI)
-
+    
     // Phương thức này nhận tham số loại tour từ Router và hiển thị danh sách
     public function listByLoaiTour($loai_tour) {
         // Lấy dữ liệu tour đã được lọc
@@ -103,7 +111,6 @@ class TourController {
         require_once 'views/tours/index.php';
     }
 
-// ...
 
     // Xóa tour
     public function destroy($id) {

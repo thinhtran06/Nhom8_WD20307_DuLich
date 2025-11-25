@@ -4,7 +4,7 @@
     <div class="row">
         <?php require_once 'views/layout/sidebar.php'; ?>
 
-        <main class="col-md-9 ml-sm-auto col-lg-10 px-4">
+        <main class="col-md-9 ml-0 col-lg-10 px-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2">Thêm Nhà Cung Cấp Mới</h1>
             </div>

@@ -137,7 +137,7 @@ public function getById($id = null) {
        $password_sql = '';
     if (!empty($this->password)) {
         $hashed_password = password_hash($this->password, PASSWORD_DEFAULT);
-        $password_sql = "password = :password, ";
+        $password_sql = ", password = :password ";
     }
 
     $query = "UPDATE " . $this->table . "
