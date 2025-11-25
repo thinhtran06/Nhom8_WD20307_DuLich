@@ -66,20 +66,6 @@
             </li>
             
             <li class="nav-item">
-                <a class="nav-link <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'booking_') === 0) ? 'active' : ''; ?>" 
-                    href="index.php?action=booking_index">
-                    🎫 Quản Lý Đặt Chỗ
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'hdv_') === 0) ? 'active' : ''; ?>" 
-                    href="index.php?action=hdv_index">
-                    👨‍💼 Quản Lý Hướng Dẫn Viên
-                </a>
-            </li>
-            
-            <li class="nav-item">
                 <a class="nav-link menu-toggle <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'tour_') === 0) ? 'active' : ''; ?>" 
                     href="#tourSubmenu" data-toggle="collapse" aria-expanded="<?php echo (isset($_GET['action']) && strpos($_GET['action'], 'tour_') === 0) ? 'true' : 'false'; ?>">
                     🏖️ Quản Lý Tour
@@ -165,6 +151,19 @@
                 </ul>
             </li>
             <?php endif; ?>
+                   <li class="nav-item">
+                <a class="nav-link <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'booking_') === 0) ? 'active' : ''; ?>" 
+                    href="index.php?action=booking_index">
+                    🎫 Quản Lý Đặt Chỗ
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'hdv_') === 0) ? 'active' : ''; ?>" 
+                    href="index.php?action=hdv_index">
+                    👨‍💼 Quản Lý Hướng Dẫn Viên
+                </a>
+            </li>
             
             <li class="nav-item">
                 <a class="nav-link" href="index.php?action=logout" 

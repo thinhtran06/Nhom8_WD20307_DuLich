@@ -20,7 +20,7 @@ spl_autoload_register(function ($className) {
         }
     }
     
-    // THÊM: Tải Models (Giả định Models nằm trong thư mục 'models/' và tên file = tên class, ví dụ: User.php)
+    // THÊM: Tải Models (Giả định Models nằm trong thư mục 'models/' và tên file = tên class)
     if (file_exists('models/' . $className . '.php')) {
         require_once 'models/' . $className . '.php';
     }
@@ -42,40 +42,45 @@ try {
 
 $routes = [
     // --- Authentication Routes (isProtected = false) ---
-    'login'           => ['Auth', 'login', false],
-    'process_login'   => ['Auth', 'processLogin', false],
-    'logout'          => ['Auth', 'logout', false],
+    'login'             => ['Auth', 'login', false],
+    'process_login'     => ['Auth', 'processLogin', false],
+    'logout'            => ['Auth', 'logout', false],
 
     // --- Dashboard & Default Route (isProtected = true) ---
-    ''                => ['Dashboard', 'index', true],
-    'dashboard'       => ['Dashboard', 'index', true], 
+    ''                  => ['Dashboard', 'index', true],
+    'dashboard'         => ['Dashboard', 'index', true], 
 
     // --- Tour Routes (isProtected = true) ---
-    'tour_index'      => ['Tour', 'index', true],
-    'tour_create'     => ['Tour', 'create', true],
-    'tour_store'      => ['Tour', 'store', true],
-    'tour_show'       => ['Tour', 'show', true],
-    'tour_edit'       => ['Tour', 'edit', true],
-    'tour_update'     => ['Tour', 'update', true],
-    'tour_delete'     => ['Tour', 'destroy', true],
+    'tour_index'        => ['Tour', 'index', true], // Hiển thị tất cả tour (mặc định)
+    
+    // THÊM: Các routes cho việc lọc tour theo loại (dùng listByLoaiTour)
+    'tour_trong_nuoc'   => ['Tour', 'listByLoaiTour', true], 
+    'tour_ngoai_nuoc'   => ['Tour', 'listByLoaiTour', true], 
+    
+    'tour_create'       => ['Tour', 'create', true],
+    'tour_store'        => ['Tour', 'store', true],
+    'tour_show'         => ['Tour', 'show', true],
+    'tour_edit'         => ['Tour', 'edit', true],
+    'tour_update'       => ['Tour', 'update', true],
+    'tour_delete'       => ['Tour', 'destroy', true],
 
     // --- Supplier Routes (isProtected = true) ---
-    'supplier_index'  => ['Supplier', 'index', true],
-    'supplier_create' => ['Supplier', 'create', true],
-    'supplier_store'  => ['Supplier', 'store', true],
-    'supplier_show'   => ['Supplier', 'show', true],
-    'supplier_edit'   => ['Supplier', 'edit', true],
-    'supplier_update' => ['Supplier', 'update', true],
-    'supplier_delete' => ['Supplier', 'destroy', true],
+    'supplier_index'    => ['Supplier', 'index', true],
+    'supplier_create'   => ['Supplier', 'create', true],
+    'supplier_store'    => ['Supplier', 'store', true],
+    'supplier_show'     => ['Supplier', 'show', true],
+    'supplier_edit'     => ['Supplier', 'edit', true],
+    'supplier_update'   => ['Supplier', 'update', true],
+    'supplier_delete'   => ['Supplier', 'destroy', true],
     
     // --- User Routes (isProtected = true) --- 
-    'user_index'      => ['User', 'index', true],
-    'user_create'     => ['User', 'create', true],
-    'user_store'      => ['User', 'store', true],
-    'user_show'       => ['User', 'show', true],
-    'user_edit'       => ['User', 'edit', true],
-    'user_update'     => ['User', 'update', true],
-    'user_delete'     => ['User', 'destroy', true],
+    'user_index'        => ['User', 'index', true],
+    'user_create'       => ['User', 'create', true],
+    'user_store'        => ['User', 'store', true],
+    'user_show'         => ['User', 'show', true],
+    'user_edit'         => ['User', 'edit', true],
+    'user_update'       => ['User', 'update', true],
+    'user_delete'       => ['User', 'destroy', true],
 ];
 
 
@@ -93,16 +98,21 @@ if (isset($routes[$action])) {
         requireLogin();
     }
     
-    // 4.2 Khởi tạo Controller và Gọi phương thức
+    // 4.2 Khởi tạo Controller
     $controllerClass = $controllerName . 'Controller';
     
-    // KHẮC PHỤC LỖI: Truyền đối tượng kết nối $conn vào constructor
-    // Tất cả Controllers (kể cả Auth, Dashboard, Tour, Supplier) đều phải nhận $conn
-    // nếu chúng sử dụng Model mà Model đó cần $db.
+    // Truyền đối tượng kết nối $conn vào constructor
     $controller = new $controllerClass($conn); 
     
-    // Gọi phương thức tương ứng.
-    $controller->$method($id);
+    // 4.3 Gọi phương thức tương ứng, xử lý trường hợp lọc Tour
+    if ($method === 'listByLoaiTour') {
+        // Xử lý logic lọc Tour: Xác định loại tour cần truyền vào Controller
+        $loai_tour = ($action === 'tour_trong_nuoc') ? 'Trong nước' : 'Ngoài nước';
+        $controller->$method($loai_tour);
+    } else {
+        // Gọi phương thức thông thường (truyền $id nếu cần, hoặc null)
+        $controller->$method($id);
+    }
     
     exit(); // Dừng ứng dụng sau khi xử lý route thành công
     
@@ -111,6 +121,4 @@ if (isset($routes[$action])) {
     header("Location: index.php?action=dashboard");
     exit();
 }
-
-// KHỐI CODE LẶP LẠI Ở CUỐI ĐÃ ĐƯỢC XÓA
 ?>

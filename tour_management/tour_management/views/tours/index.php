@@ -17,7 +17,7 @@
                 <th>Mô Tả</th>
                 <th>Khởi hành</th>
                 <th>Điểm đến</th>
-                <th>Ngày đi</th>
+                <!-- <th>Ngày đi</th> -->
                 <th>Số ngày</th>
                 <th>Giá</th>
                 <th>Số chỗ</th>
@@ -33,7 +33,7 @@
                 <td><?php echo $tour['mo_ta']; ?></td>
                 <td><?php echo $tour['diem_khoi_hanh']; ?></td>
                 <td><?php echo $tour['diem_den']; ?></td>
-                <td><?php echo date('d/m/Y', strtotime($tour['ngay_khoi_hanh'])); ?></td>
+              
                 <td><?php echo $tour['so_ngay']; ?> ngày</td>
                 <td><?php echo number_format($tour['gia_tour']); ?> VNĐ</td>
                 <td><?php echo $tour['so_cho']; ?></td>

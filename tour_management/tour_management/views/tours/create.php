@@ -30,12 +30,7 @@
         </div>
 
         <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>Ngày khởi hành:</label>
-                    <input type="date" name="ngay_khoi_hanh" class="form-control" required>
-                </div>
-            </div>
+            
             <div class="col-md-6">
                 <div class="form-group">
                     <label>Số ngày:</label>
@@ -60,10 +55,14 @@
         </div>
 
         <div class="form-group">
+            <label>📋 **Lịch trình chi tiết:**</label>
+            <textarea name="lich_trinh" class="form-control" rows="8" placeholder="Nhập lịch trình chi tiết (Ví dụ: *Ngày 1: Tham quan... *Ngày 2: Chèo thuyền...)"></textarea>
+            <small class="form-text text-muted">Nội dung này sẽ được hiển thị trên trang chi tiết tour.</small>
+        </div>
+        <div class="form-group">
             <label>Trạng thái:</label>
             <select name="trang_thai" class="form-control">
                 <option value="Còn chỗ">Còn chỗ</option>
-                <option value="Hết chỗ">Hết chỗ</option>
                 <option value="Sắp khởi hành">Sắp khởi hành</option>
             </select>
         </div>

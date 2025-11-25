@@ -30,12 +30,7 @@
         </div>
 
         <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>Ngày khởi hành:</label>
-                    <input type="date" name="ngay_khoi_hanh" value="<?php echo $this->tour->ngay_khoi_hanh; ?>" class="form-control" required>
-                </div>
-            </div>
+           
             <div class="col-md-6">
                 <div class="form-group">
                     <label>Số ngày:</label>
