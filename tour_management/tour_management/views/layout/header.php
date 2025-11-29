@@ -55,20 +55,26 @@ $isCategoryActive = in_array($currentAction, $categoryActions);
         📁 Quản Lý Danh Mục
         <span class="arrow">▼</span>
     </a>
-    <ul class="collapse submenu <?php echo $isCategoryActive ? 'show' : ''; ?>" id="categorySubmenu">
-        <li>
-            <a href="index.php?action=tour_trong_nuoc" 
-               class="<?php echo ($currentAction == 'tour_trong_nuoc') ? 'active' : ''; ?>">
-                🇻🇳 Tour Trong Nước
-            </a>
-        </li>
-        <li>
-            <a href="index.php?action=tour_ngoai_nuoc" 
-               class="<?php echo ($currentAction == 'tour_ngoai_nuoc') ? 'active' : ''; ?>">
-                🌐 Tour Ngoài Nước
-            </a>
-        </li>
-        </ul>
+ <ul class="collapse submenu <?php echo $isCategoryActive ? 'show' : ''; ?>" id="categorySubmenu">
+    <li>
+        <a href="index.php?action=tour_trong_nuoc" 
+           class="<?php echo ($currentAction == 'tour_trong_nuoc') ? 'active' : ''; ?>">
+            🇻🇳 Tour Trong Nước
+        </a>
+    </li>
+    <li>
+        <a href="index.php?action=tour_ngoai_nuoc" 
+           class="<?php echo ($currentAction == 'tour_ngoai_nuoc') ? 'active' : ''; ?>">
+            🌐 Tour Ngoài Nước
+        </a>
+    </li>
+    <li>
+        <a href="index.php?action=tour_request_index"
+           class="<?php echo ($currentAction == 'tour_request_index') ? 'active' : ''; ?>">
+            💡 Tour Theo Yêu cầu
+        </a>
+    </li>
+</ul>
 </li>
             
             <li class="nav-item">

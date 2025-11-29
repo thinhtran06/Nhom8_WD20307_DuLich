@@ -81,6 +81,14 @@ $routes = [
     'user_edit'         => ['User', 'edit', true],
     'user_update'       => ['User', 'update', true],
     'user_delete'       => ['User', 'destroy', true],
+    // --- Tour Request Routes (isProtected = true) ---
+  'tour_request_create'  => ['TourRequest', 'create', true], 
+    
+    // THÊM: Route mới để xử lý lưu yêu cầu nội bộ
+    'tour_request_store'   => ['TourRequest', 'store', true], 
+    
+    'tour_request_index'   => ['TourRequest', 'index', true],
+    'tour_request_show'    => ['TourRequest', 'show', true],
 ];
 
 
