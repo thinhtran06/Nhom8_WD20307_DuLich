@@ -11,7 +11,7 @@ class TourRequest {
     public $dien_thoai;
     public $email;
     public $so_luong_khach;
-    public $diem_den_mong_muon; // <-- SỬA: Đổi 'luon' thành 'muon' để khớp với DB
+    public $diem_den_mong_muon; 
     public $ngay_khoi_hanh_mong_luon; 
     public $ngan_sach; 
     public $yeu_cau_chi_tiet;

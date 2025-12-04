@@ -89,8 +89,47 @@ $routes = [
     
     'tour_request_index'   => ['TourRequest', 'index', true],
     'tour_request_show'    => ['TourRequest', 'show', true],
-];
 
+    // --- GUIDE ROUTES ---
+'guide_index'            => ['Guide', 'index', true],
+'guide_create'           => ['Guide', 'create', true],
+'guide_store'            => ['Guide', 'store', true],
+'guide_edit'             => ['Guide', 'edit', true],
+'guide_update'           => ['Guide', 'update', true],
+'guide_delete'           => ['Guide', 'destroy', true],
+
+// Lịch làm việc HDV
+'guide_schedule'         => ['Guide', 'schedule', true],
+
+// Chi tiết tour HDV
+'guide_tour_detail'      => ['Guide', 'tourDetail', true],
+
+// Danh sách khách theo tour
+'guide_customers'        => ['Guide', 'customers', true],
+
+//  THÊM  ĐỂ THÊM KHÁCH HÀNG
+'guide_customer_add'      => ['Guide', 'addCustomerForm', true],
+'guide_customer_store'    => ['Guide', 'customerStore', true],
+//  Xóa  ĐỂ THÊM KHÁCH HÀNG
+
+'guide_customer_delete' => ['Guide', 'customerDelete', true],
+
+// Điểm danh khách
+'guide_checkin'          => ['Guide', 'checkin', true],
+'guide_save_checkin'     => ['Guide', 'saveCheckin', true],
+
+// Yêu cầu đặc biệt
+'guide_special_request'        => ['Guide', 'specialRequest', true],
+'guide_save_special_request'   => ['Guide', 'saveSpecialRequest', true],
+
+// NHẬT KÝ TOUR — DÙNG GuideDiaryController
+'guide_diary'         => ['GuideDiary', 'index', true],
+'guide_diary_add'     => ['GuideDiary', 'add', true],
+'guide_diary_edit'    => ['GuideDiary', 'edit', true],
+'guide_diary_store'    => ['GuideDiary', 'save', true],
+'guide_diary_delete' => ['GuideDiary', 'delete', true],
+
+];
 
 // ==================== 4. Xử lý Route Chính ====================
 

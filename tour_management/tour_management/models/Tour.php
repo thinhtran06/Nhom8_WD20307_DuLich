@@ -1,17 +1,17 @@
 <?php
 
 class Tour {
-    // Kết nối CSDL và tên bảng
+
     private $conn;
     private $table = "tours";
 
-    // Thuộc tính đối tượng
+    // Thuộc tính tương ứng CSDL
     public $id;
     public $ten_tour;
     public $mo_ta;
     public $diem_khoi_hanh;
     public $diem_den;
-    public $loai_tour; // THÊM: Thuộc tính mới
+    public $loai_tour;
     public $ngay_khoi_hanh;
     public $so_ngay;
     public $gia_tour;
@@ -19,164 +19,140 @@ class Tour {
     public $trang_thai;
     public $lich_trinh;
 
-    // Constructor với $db
-    public function __construct($db) {
+    public function __construct($db){
         $this->conn = $db;
     }
 
-    // --- PHƯƠNG THỨC CRUD ---
-
-    // 1. Lấy tất cả tour
-    public function getAll() {
-        $query = "SELECT * FROM " . $this->table . " ORDER BY id DESC";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        return $stmt;
-    }
-
-    // 2. Lấy tour theo ID
-    public function getById() {
-        $query = "SELECT * FROM " . $this->table . " WHERE id = ? LIMIT 0,1";
-
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->id);
-        $stmt->execute();
-
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        // Gán giá trị vào thuộc tính đối tượng
-        if ($row) {
-            $this->ten_tour = $row['ten_tour'];
-            $this->mo_ta = $row['mo_ta'];
-            $this->diem_khoi_hanh = $row['diem_khoi_hanh'];
-            $this->diem_den = $row['diem_den'];
-            $this->loai_tour = $row['loai_tour']; // GÁN THUỘC TÍNH MỚI
-            $this->ngay_khoi_hanh = $row['ngay_khoi_hanh'];
-            $this->so_ngay = $row['so_ngay'];
-            $this->gia_tour = $row['gia_tour'];
-            $this->so_cho = $row['so_cho'];
-            $this->trang_thai = $row['trang_thai'];
-            $this->lich_trinh = $row['lich_trinh'];
-            return true;
+    /* ========================
+        LẤY DANH SÁCH TOUR
+    ======================== */
+    public function getAll(){
+        try {
+            $sql = "SELECT * FROM {$this->table} ORDER BY id DESC";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_OBJ);
+        } catch (PDOException $e) {
+            error_log("Tour getAll error: " . $e->getMessage());
+            return false;
         }
-        return false;
     }
 
-    // 3. Tạo tour mới (CẬP NHẬT: Thêm loai_tour)
-    public function create() {
-        $query = "INSERT INTO " . $this->table . " 
-                  SET ten_tour=:ten_tour, mo_ta=:mo_ta, 
-                      diem_khoi_hanh=:diem_khoi_hanh, diem_den=:diem_den,
-                      loai_tour=:loai_tour, -- THÊM VÀO TRUY VẤN
-                      ngay_khoi_hanh=:ngay_khoi_hanh, so_ngay=:so_ngay,
-                      gia_tour=:gia_tour, so_cho=:so_cho, trang_thai=:trang_thai, 
-                      lich_trinh=:lich_trinh"; 
+    /* ========================
+        LẤY 1 TOUR THEO ID (ĐÃ FIX)
+    ======================== */
+    public function getById($id = null) {
+   
+    $id = $id ?? $this->id;
 
-        $stmt = $this->conn->prepare($query);
+    if (!$id) return null;
 
-        // Làm sạch và Bind dữ liệu
-        $this->ten_tour = htmlspecialchars(strip_tags($this->ten_tour));
-        $this->mo_ta = htmlspecialchars(strip_tags($this->mo_ta));
-        $this->diem_khoi_hanh = htmlspecialchars(strip_tags($this->diem_khoi_hanh));
-        $this->diem_den = htmlspecialchars(strip_tags($this->diem_den));
-        $this->loai_tour = htmlspecialchars(strip_tags($this->loai_tour)); // BIND THUỘC TÍNH MỚI
-$this->ngay_khoi_hanh = $this->ngay_khoi_hanh !== null 
-                                ? htmlspecialchars(strip_tags($this->ngay_khoi_hanh)) 
-                                : null;        $this->so_ngay = htmlspecialchars(strip_tags($this->so_ngay));
-        $this->gia_tour = htmlspecialchars(strip_tags($this->gia_tour));
-        $this->so_cho = htmlspecialchars(strip_tags($this->so_cho));
-        $this->trang_thai = htmlspecialchars(strip_tags($this->trang_thai));
-        $this->lich_trinh = htmlspecialchars(strip_tags($this->lich_trinh));
+    $query = "SELECT * FROM " . $this->table . " WHERE id = ? LIMIT 1";
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute([$id]);
 
-        $stmt->bindParam(":ten_tour", $this->ten_tour);
-        $stmt->bindParam(":mo_ta", $this->mo_ta);
-        $stmt->bindParam(":diem_khoi_hanh", $this->diem_khoi_hanh);
-        $stmt->bindParam(":diem_den", $this->diem_den);
-        $stmt->bindParam(":loai_tour", $this->loai_tour); // BIND CHÍNH XÁC
-        $stmt->bindParam(":ngay_khoi_hanh", $this->ngay_khoi_hanh);
-        $stmt->bindParam(":so_ngay", $this->so_ngay);
-        $stmt->bindParam(":gia_tour", $this->gia_tour);
-        $stmt->bindParam(":so_cho", $this->so_cho);
-        $stmt->bindParam(":trang_thai", $this->trang_thai);
-        $stmt->bindParam(":lich_trinh", $this->lich_trinh);
+    return $stmt->fetch(PDO::FETCH_OBJ);
+}
 
-        if ($stmt->execute()) {
-            return true;
+
+    /* ========================
+          THÊM TOUR MỚI
+    ======================== */
+    public function create(){
+        try {
+            $sql = "INSERT INTO {$this->table}
+                (ten_tour, mo_ta, diem_khoi_hanh, diem_den, loai_tour,
+                 ngay_khoi_hanh, so_ngay, gia_tour, so_cho, trang_thai, lich_trinh)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+
+            $stmt = $this->conn->prepare($sql);
+
+            return $stmt->execute([
+                $this->ten_tour,
+                $this->mo_ta,
+                $this->diem_khoi_hanh,
+                $this->diem_den,
+                $this->loai_tour,
+                $this->ngay_khoi_hanh,
+                $this->so_ngay,
+                $this->gia_tour,
+                $this->so_cho,
+                $this->trang_thai,
+                $this->lich_trinh
+            ]);
+
+        } catch (PDOException $e) {
+            error_log("Tour create error: " . $e->getMessage());
+            return false;
         }
-        return false;
     }
 
-    // 4. Cập nhật tour (CẬP NHẬT: Thêm loai_tour)
-    public function update() {
-        $query = "UPDATE " . $this->table . " 
-                  SET ten_tour=:ten_tour, mo_ta=:mo_ta,
-                      diem_khoi_hanh=:diem_khoi_hanh, diem_den=:diem_den,
-                      loai_tour=:loai_tour, -- THÊM VÀO TRUY VẤN
-                      ngay_khoi_hanh=:ngay_khoi_hanh, so_ngay=:so_ngay,
-                      gia_tour=:gia_tour, so_cho=:so_cho, trang_thai=:trang_thai,
-                      lich_trinh=:lich_trinh  
-                  WHERE id=:id"; 
+    /* ========================
+           CẬP NHẬT TOUR
+    ======================== */
+    public function update(){
+        try {
+            $sql = "UPDATE {$this->table}
+                SET 
+                    ten_tour=?, mo_ta=?, diem_khoi_hanh=?, diem_den=?,
+                    loai_tour=?, ngay_khoi_hanh=?, so_ngay=?, gia_tour=?,
+                    so_cho=?, trang_thai=?, lich_trinh=?
+                WHERE id=?";
 
-        $stmt = $this->conn->prepare($query);
+            $stmt = $this->conn->prepare($sql);
 
-        // Làm sạch và Bind dữ liệu
-        $this->ten_tour = htmlspecialchars(strip_tags($this->ten_tour));
-        $this->mo_ta = htmlspecialchars(strip_tags($this->mo_ta));
-        $this->diem_khoi_hanh = htmlspecialchars(strip_tags($this->diem_khoi_hanh));
-        $this->diem_den = htmlspecialchars(strip_tags($this->diem_den));
-        $this->loai_tour = htmlspecialchars(strip_tags($this->loai_tour)); // BIND THUỘC TÍNH MỚI
-        $this->ngay_khoi_hanh = htmlspecialchars(strip_tags($this->ngay_khoi_hanh));
-        $this->so_ngay = htmlspecialchars(strip_tags($this->so_ngay));
-        $this->gia_tour = htmlspecialchars(strip_tags($this->gia_tour));
-        $this->so_cho = htmlspecialchars(strip_tags($this->so_cho));
-        $this->trang_thai = htmlspecialchars(strip_tags($this->trang_thai));
-        $this->lich_trinh = htmlspecialchars(strip_tags($this->lich_trinh));
-        $this->id = htmlspecialchars(strip_tags($this->id));
+            return $stmt->execute([
+                $this->ten_tour,
+                $this->mo_ta,
+                $this->diem_khoi_hanh,
+                $this->diem_den,
+                $this->loai_tour,
+                $this->ngay_khoi_hanh,
+                $this->so_ngay,
+                $this->gia_tour,
+                $this->so_cho,
+                $this->trang_thai,
+                $this->lich_trinh,
+                $this->id
+            ]);
 
-        $stmt->bindParam(":ten_tour", $this->ten_tour);
-        $stmt->bindParam(":mo_ta", $this->mo_ta);
-        $stmt->bindParam(":diem_khoi_hanh", $this->diem_khoi_hanh);
-        $stmt->bindParam(":diem_den", $this->diem_den);
-        $stmt->bindParam(":loai_tour", $this->loai_tour); // BIND CHÍNH XÁC
-        $stmt->bindParam(":ngay_khoi_hanh", $this->ngay_khoi_hanh);
-        $stmt->bindParam(":so_ngay", $this->so_ngay);
-        $stmt->bindParam(":gia_tour", $this->gia_tour);
-        $stmt->bindParam(":so_cho", $this->so_cho);
-        $stmt->bindParam(":trang_thai", $this->trang_thai);
-        $stmt->bindParam(":lich_trinh", $this->lich_trinh);
-        $stmt->bindParam(":id", $this->id);
-
-        if ($stmt->execute()) {
-            return true;
+        } catch (PDOException $e) {
+            error_log("Tour update error: " . $e->getMessage());
+            return false;
         }
-        return false;
     }
 
-    // 5. Xóa tour
-    public function delete() {
-        $query = "DELETE FROM " . $this->table . " WHERE id = ?";
-        $stmt = $this->conn->prepare($query);
+    /* ========================
+            XÓA TOUR
+    ======================== */
+    public function delete(){
+        try {
+            $sql = "DELETE FROM {$this->table} WHERE id = ?";
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([$this->id]);
 
-        $this->id = htmlspecialchars(strip_tags($this->id));
-        $stmt->bindParam(1, $this->id);
-
-        if ($stmt->execute()) {
-            return true;
+        } catch (PDOException $e) {
+            error_log("Tour delete error: " . $e->getMessage());
+            return false;
         }
-        return false;
     }
-    
-    // 6. Lấy tour theo loại (Cho Router listByLoaiTour)
-    public function getByLoaiTour($loai_tour) {
-        $query = "SELECT t.* FROM " . $this->table . " t
-                  WHERE t.loai_tour = :loai_tour
-                  ORDER BY t.id ASC";
 
-        $stmt = $this->conn->prepare($query);
-        // Làm sạch và Bind dữ liệu
-        $loai_tour_clean = htmlspecialchars(strip_tags($loai_tour));
-        $stmt->bindParam(":loai_tour", $loai_tour_clean);
-        $stmt->execute();
-        return $stmt;
+    /* ========================
+     LẤY TOUR THEO LOẠI
+    ======================== */
+    public function getByLoaiTour($loai){
+        try {
+            $sql = "SELECT * FROM {$this->table}
+                    WHERE loai_tour = ?
+                    ORDER BY id DESC";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$loai]);
+            return $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        } catch (PDOException $e) {
+            error_log("Tour getByLoaiTour error: " . $e->getMessage());
+            return false;
+        }
     }
 }
