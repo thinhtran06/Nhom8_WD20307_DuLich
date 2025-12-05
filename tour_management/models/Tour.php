@@ -1,6 +1,7 @@
 <?php
 
-class Tour {
+class Tour
+{
     // Kết nối CSDL và tên bảng
     private $conn;
     private $table = "tours";
@@ -20,14 +21,16 @@ class Tour {
     public $lich_trinh;
 
     // Constructor với $db
-    public function __construct($db) {
+    public function __construct($db)
+    {
         $this->conn = $db;
     }
 
     // --- PHƯƠNG THỨC CRUD ---
 
     // 1. Lấy tất cả tour
-    public function getAll() {
+    public function getAll()
+    {
         $query = "SELECT * FROM " . $this->table . " ORDER BY id DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -35,7 +38,8 @@ class Tour {
     }
 
     // 2. Lấy tour theo ID
-    public function getById() {
+    public function getById()
+    {
         $query = "SELECT * FROM " . $this->table . " WHERE id = ? LIMIT 0,1";
 
         $stmt = $this->conn->prepare($query);
@@ -63,14 +67,15 @@ class Tour {
     }
 
     // 3. Tạo tour mới (CẬP NHẬT: Thêm loai_tour)
-    public function create() {
+    public function create()
+    {
         $query = "INSERT INTO " . $this->table . " 
                   SET ten_tour=:ten_tour, mo_ta=:mo_ta, 
                       diem_khoi_hanh=:diem_khoi_hanh, diem_den=:diem_den,
                       loai_tour=:loai_tour, -- THÊM VÀO TRUY VẤN
                       ngay_khoi_hanh=:ngay_khoi_hanh, so_ngay=:so_ngay,
                       gia_tour=:gia_tour, so_cho=:so_cho, trang_thai=:trang_thai, 
-                      lich_trinh=:lich_trinh"; 
+                      lich_trinh=:lich_trinh";
 
         $stmt = $this->conn->prepare($query);
 
@@ -80,9 +85,10 @@ class Tour {
         $this->diem_khoi_hanh = htmlspecialchars(strip_tags($this->diem_khoi_hanh));
         $this->diem_den = htmlspecialchars(strip_tags($this->diem_den));
         $this->loai_tour = htmlspecialchars(strip_tags($this->loai_tour)); // BIND THUỘC TÍNH MỚI
-$this->ngay_khoi_hanh = $this->ngay_khoi_hanh !== null 
-                                ? htmlspecialchars(strip_tags($this->ngay_khoi_hanh)) 
-                                : null;        $this->so_ngay = htmlspecialchars(strip_tags($this->so_ngay));
+        $this->ngay_khoi_hanh = $this->ngay_khoi_hanh !== null
+            ? htmlspecialchars(strip_tags($this->ngay_khoi_hanh))
+            : null;
+        $this->so_ngay = htmlspecialchars(strip_tags($this->so_ngay));
         $this->gia_tour = htmlspecialchars(strip_tags($this->gia_tour));
         $this->so_cho = htmlspecialchars(strip_tags($this->so_cho));
         $this->trang_thai = htmlspecialchars(strip_tags($this->trang_thai));
@@ -107,7 +113,8 @@ $this->ngay_khoi_hanh = $this->ngay_khoi_hanh !== null
     }
 
     // 4. Cập nhật tour (CẬP NHẬT: Thêm loai_tour)
-    public function update() {
+    public function update()
+    {
         $query = "UPDATE " . $this->table . " 
                   SET ten_tour=:ten_tour, mo_ta=:mo_ta,
                       diem_khoi_hanh=:diem_khoi_hanh, diem_den=:diem_den,
@@ -115,7 +122,7 @@ $this->ngay_khoi_hanh = $this->ngay_khoi_hanh !== null
                       ngay_khoi_hanh=:ngay_khoi_hanh, so_ngay=:so_ngay,
                       gia_tour=:gia_tour, so_cho=:so_cho, trang_thai=:trang_thai,
                       lich_trinh=:lich_trinh  
-                  WHERE id=:id"; 
+                  WHERE id=:id";
 
         $stmt = $this->conn->prepare($query);
 
@@ -153,7 +160,8 @@ $this->ngay_khoi_hanh = $this->ngay_khoi_hanh !== null
     }
 
     // 5. Xóa tour
-    public function delete() {
+    public function delete()
+    {
         $query = "DELETE FROM " . $this->table . " WHERE id = ?";
         $stmt = $this->conn->prepare($query);
 
@@ -165,9 +173,10 @@ $this->ngay_khoi_hanh = $this->ngay_khoi_hanh !== null
         }
         return false;
     }
-    
+
     // 6. Lấy tour theo loại (Cho Router listByLoaiTour)
-    public function getByLoaiTour($loai_tour) {
+    public function getByLoaiTour($loai_tour)
+    {
         $query = "SELECT t.* FROM " . $this->table . " t
                   WHERE t.loai_tour = :loai_tour
                   ORDER BY t.id ASC";

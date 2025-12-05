@@ -171,11 +171,36 @@ $isCategoryActive = in_array($currentAction, $categoryActions);
             </li>
 
             <li class="nav-item">
-                <a class="nav-link <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'hdv_') === 0) ? 'active' : ''; ?>" 
-                    href="index.php?action=hdv_index">
-                    👨‍💼 Quản Lý Hướng Dẫn Viên
-                </a>
-            </li>
+                <?php 
+$current = $_GET['action'] ?? '';
+$guideOpen = strpos($current, 'guide_') === 0;
+?>
+
+    <a class="nav-link <?= $guideOpen ? 'active' : '' ?>" 
+       data-toggle="collapse" 
+       href="#guideMenu">
+        👨‍🏫 Quản Lý Hướng Dẫn Viên ▼
+    </a>
+
+    <ul class="collapse submenu <?= $guideOpen ? 'show' : '' ?>" id="guideMenu">
+
+        <li>
+            <a href="index.php?action=guide_index" 
+               class="<?= $current=='guide_index' ? 'active' : '' ?>">
+                📋 Danh Sách Hướng Dẫn Viên
+            </a>
+        </li>
+
+        <li>
+            <a href="index.php?action=guide_create" 
+               class="<?= $current=='guide_create' ? 'active' : '' ?>">
+                ➕ Thêm Hướng Dẫn Viên
+            </a>
+        </li>
+
+    </ul>
+</li>
+
             
             <li class="nav-item">
                 <a class="nav-link" href="index.php?action=logout" 
