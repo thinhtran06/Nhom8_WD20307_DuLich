@@ -9,10 +9,11 @@ class Tour
     // Thuộc tính đối tượng
     public $id;
     public $ten_tour;
+    public $ma_tour; // THÊM MA_TOUR (Để đồng bộ với BookingController)
     public $mo_ta;
     public $diem_khoi_hanh;
     public $diem_den;
-    public $loai_tour; // THÊM: Thuộc tính mới
+    public $loai_tour; 
     public $ngay_khoi_hanh;
     public $so_ngay;
     public $gia_tour;
@@ -28,13 +29,15 @@ class Tour
 
     // --- PHƯƠNG THỨC CRUD ---
 
-    // 1. Lấy tất cả tour
+    // 1. Lấy tất cả tour (ĐÃ TỐI ƯU cho BookingController)
     public function getAll()
     {
-        $query = "SELECT * FROM " . $this->table . " ORDER BY id DESC";
+        $query = "SELECT id, ma_tour, ten_tour, loai_tour FROM " . $this->table . " ORDER BY id DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
-        return $stmt;
+        
+        // Trả về mảng ASSOCIATIVE để các Controller (như BookingController) dễ dàng sử dụng
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // 2. Lấy tour theo ID
@@ -54,7 +57,7 @@ class Tour
             $this->mo_ta = $row['mo_ta'];
             $this->diem_khoi_hanh = $row['diem_khoi_hanh'];
             $this->diem_den = $row['diem_den'];
-            $this->loai_tour = $row['loai_tour']; // GÁN THUỘC TÍNH MỚI
+            $this->loai_tour = $row['loai_tour']; 
             $this->ngay_khoi_hanh = $row['ngay_khoi_hanh'];
             $this->so_ngay = $row['so_ngay'];
             $this->gia_tour = $row['gia_tour'];
@@ -66,13 +69,13 @@ class Tour
         return false;
     }
 
-    // 3. Tạo tour mới (CẬP NHẬT: Thêm loai_tour)
+    // 3. Tạo tour mới
     public function create()
     {
         $query = "INSERT INTO " . $this->table . " 
                   SET ten_tour=:ten_tour, mo_ta=:mo_ta, 
                       diem_khoi_hanh=:diem_khoi_hanh, diem_den=:diem_den,
-                      loai_tour=:loai_tour, -- THÊM VÀO TRUY VẤN
+                      loai_tour=:loai_tour,
                       ngay_khoi_hanh=:ngay_khoi_hanh, so_ngay=:so_ngay,
                       gia_tour=:gia_tour, so_cho=:so_cho, trang_thai=:trang_thai, 
                       lich_trinh=:lich_trinh";
@@ -84,7 +87,7 @@ class Tour
         $this->mo_ta = htmlspecialchars(strip_tags($this->mo_ta));
         $this->diem_khoi_hanh = htmlspecialchars(strip_tags($this->diem_khoi_hanh));
         $this->diem_den = htmlspecialchars(strip_tags($this->diem_den));
-        $this->loai_tour = htmlspecialchars(strip_tags($this->loai_tour)); // BIND THUỘC TÍNH MỚI
+        $this->loai_tour = htmlspecialchars(strip_tags($this->loai_tour)); 
         $this->ngay_khoi_hanh = $this->ngay_khoi_hanh !== null
             ? htmlspecialchars(strip_tags($this->ngay_khoi_hanh))
             : null;
@@ -98,7 +101,7 @@ class Tour
         $stmt->bindParam(":mo_ta", $this->mo_ta);
         $stmt->bindParam(":diem_khoi_hanh", $this->diem_khoi_hanh);
         $stmt->bindParam(":diem_den", $this->diem_den);
-        $stmt->bindParam(":loai_tour", $this->loai_tour); // BIND CHÍNH XÁC
+        $stmt->bindParam(":loai_tour", $this->loai_tour); 
         $stmt->bindParam(":ngay_khoi_hanh", $this->ngay_khoi_hanh);
         $stmt->bindParam(":so_ngay", $this->so_ngay);
         $stmt->bindParam(":gia_tour", $this->gia_tour);
@@ -112,13 +115,13 @@ class Tour
         return false;
     }
 
-    // 4. Cập nhật tour (CẬP NHẬT: Thêm loai_tour)
+    // 4. Cập nhật tour
     public function update()
     {
         $query = "UPDATE " . $this->table . " 
                   SET ten_tour=:ten_tour, mo_ta=:mo_ta,
                       diem_khoi_hanh=:diem_khoi_hanh, diem_den=:diem_den,
-                      loai_tour=:loai_tour, -- THÊM VÀO TRUY VẤN
+                      loai_tour=:loai_tour,
                       ngay_khoi_hanh=:ngay_khoi_hanh, so_ngay=:so_ngay,
                       gia_tour=:gia_tour, so_cho=:so_cho, trang_thai=:trang_thai,
                       lich_trinh=:lich_trinh  
@@ -131,7 +134,7 @@ class Tour
         $this->mo_ta = htmlspecialchars(strip_tags($this->mo_ta));
         $this->diem_khoi_hanh = htmlspecialchars(strip_tags($this->diem_khoi_hanh));
         $this->diem_den = htmlspecialchars(strip_tags($this->diem_den));
-        $this->loai_tour = htmlspecialchars(strip_tags($this->loai_tour)); // BIND THUỘC TÍNH MỚI
+        $this->loai_tour = htmlspecialchars(strip_tags($this->loai_tour));
         $this->ngay_khoi_hanh = htmlspecialchars(strip_tags($this->ngay_khoi_hanh));
         $this->so_ngay = htmlspecialchars(strip_tags($this->so_ngay));
         $this->gia_tour = htmlspecialchars(strip_tags($this->gia_tour));
@@ -144,7 +147,7 @@ class Tour
         $stmt->bindParam(":mo_ta", $this->mo_ta);
         $stmt->bindParam(":diem_khoi_hanh", $this->diem_khoi_hanh);
         $stmt->bindParam(":diem_den", $this->diem_den);
-        $stmt->bindParam(":loai_tour", $this->loai_tour); // BIND CHÍNH XÁC
+        $stmt->bindParam(":loai_tour", $this->loai_tour);
         $stmt->bindParam(":ngay_khoi_hanh", $this->ngay_khoi_hanh);
         $stmt->bindParam(":so_ngay", $this->so_ngay);
         $stmt->bindParam(":gia_tour", $this->gia_tour);
@@ -186,6 +189,8 @@ class Tour
         $loai_tour_clean = htmlspecialchars(strip_tags($loai_tour));
         $stmt->bindParam(":loai_tour", $loai_tour_clean);
         $stmt->execute();
-        return $stmt;
+        
+        // Trả về mảng ASSOCIATIVE để Controller dễ dàng sử dụng
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

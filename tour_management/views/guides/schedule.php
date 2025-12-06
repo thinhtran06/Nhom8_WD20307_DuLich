@@ -10,7 +10,7 @@ if (!$guide) {
 
 $guide_id = (int)$guide->id;
 ?>
-
+<div style="margin-left:260px; margin-top:30px; padding:20px;">
 <h3 class="mt-3">
     Lịch làm việc của Hướng Dẫn Viên: 
     <span class="text-primary fw-bold"><?= htmlspecialchars($guide->ho_ten ?? '') ?></span>
@@ -127,5 +127,5 @@ $guide_id = (int)$guide->id;
 </div>
 
 <a href="index.php?action=guide_index" class="btn btn-secondary mt-3">Quay lại</a>
-
+</div>
 <?php include "views/layout/footer.php"; ?>

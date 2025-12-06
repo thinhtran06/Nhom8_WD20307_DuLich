@@ -14,7 +14,7 @@ if (empty($guide)) {
     return;
 }
 ?>
-
+<div style="margin-left:260px; margin-top:80px; padding:20px;">
 <h3 class="mt-3">Sửa thông tin Hướng Dẫn Viên</h3>
 
 <!-- FORM UPDATE HDV -->
@@ -109,5 +109,5 @@ if (empty($guide)) {
     <a href="index.php?action=guide_index" class="btn btn-secondary">Hủy</a>
 
 </form>
-
+<</div>
 <?php include "views/layout/footer.php"; ?>

@@ -20,7 +20,7 @@ spl_autoload_register(function ($className) {
         }
     }
 
-    // THÊM: Tải Models (Giả định Models nằm trong thư mục 'models/' và tên file = tên class)
+    // Tải Models (Giả định Models nằm trong thư mục 'models/' và tên file = tên class)
     if (file_exists('models/' . $className . '.php')) {
         require_once 'models/' . $className . '.php';
     }
@@ -38,6 +38,8 @@ try {
 }
 
 
+
+
 // ==================== 3. Router Map (Bản đồ định tuyến) ====================
 
 $routes = [
@@ -51,9 +53,7 @@ $routes = [
     'dashboard'         => ['Dashboard', 'index', true],
 
     // --- Tour Routes (isProtected = true) ---
-    'tour_index'        => ['Tour', 'index', true], // Hiển thị tất cả tour (mặc định)
-
-    // THÊM: Các routes cho việc lọc tour theo loại (dùng listByLoaiTour)
+    'tour_index'        => ['Tour', 'index', true], // Hiển thị tất cả tour
     'tour_trong_nuoc'   => ['Tour', 'listByLoaiTour', true],
     'tour_ngoai_nuoc'   => ['Tour', 'listByLoaiTour', true],
 
@@ -81,57 +81,57 @@ $routes = [
     'user_edit'         => ['User', 'edit', true],
     'user_update'       => ['User', 'update', true],
     'user_delete'       => ['User', 'destroy', true],
+    
     // --- Tour Request Routes (isProtected = true) ---
-    'tour_request_create'  => ['TourRequest', 'create', true],
-
-    // THÊM: Route mới để xử lý lưu yêu cầu nội bộ
-    'tour_request_store'   => ['TourRequest', 'store', true],
-
-    'tour_request_index'   => ['TourRequest', 'index', true],
-    'tour_request_show'    => ['TourRequest', 'show', true],
-    'tour_request_detail'  => ['TourRequest', 'detail', true],
-    'tour_request_delete'  => ['TourRequest', 'delete', true],
-    'tour_request_edit'    => ['TourRequest', 'edit', true],
-    'tour_request_update'  => ['TourRequest', 'update', true],
+    'tour_request_create'   => ['TourRequest', 'create', true],
+    'tour_request_store'    => ['TourRequest', 'store', true],
+    'tour_request_index'    => ['TourRequest', 'index', true],
+    'tour_request_show'     => ['TourRequest', 'show', true],
+    'tour_request_detail'   => ['TourRequest', 'detail', true],
+    'tour_request_delete'   => ['TourRequest', 'delete', true],
+    'tour_request_edit'     => ['TourRequest', 'edit', true],
+    'tour_request_update'   => ['TourRequest', 'update', true],
+    
     // --- GUIDE ROUTES ---
-    'guide_index'            => ['Guide', 'index', true],
-    'guide_create'           => ['Guide', 'create', true],
-    'guide_store'            => ['Guide', 'store', true],
-    'guide_edit'             => ['Guide', 'edit', true],
-    'guide_update'           => ['Guide', 'update', true],
-    'guide_delete'           => ['Guide', 'destroy', true],
+    'guide_index'               => ['Guide', 'index', true],
+    'guide_create'              => ['Guide', 'create', true],
+    'guide_store'               => ['Guide', 'store', true],
+    'guide_edit'                => ['Guide', 'edit', true],
+    'guide_update'              => ['Guide', 'update', true],
+    'guide_delete'              => ['Guide', 'destroy', true],
 
     // Lịch làm việc HDV
-    'guide_schedule'         => ['Guide', 'schedule', true],
-
+    'guide_schedule'            => ['Guide', 'schedule', true],
     // Chi tiết tour HDV
-    'guide_tour_detail'      => ['Guide', 'tourDetail', true],
-
+    'guide_tour_detail'         => ['Guide', 'tourDetail', true],
     // Danh sách khách theo tour
-    'guide_customers'        => ['Guide', 'customers', true],
-
-    //  THÊM  ĐỂ THÊM KHÁCH HÀNG
-    'guide_customer_add'      => ['Guide', 'addCustomerForm', true],
-    'guide_customer_store'    => ['Guide', 'customerStore', true],
-    //  Xóa  ĐỂ THÊM KHÁCH HÀNG
-
-    'guide_customer_delete' => ['Guide', 'customerDelete', true],
-
+    'guide_customers'           => ['Guide', 'customers', true],
+    // THÊM KHÁCH HÀNG
+    'guide_customer_add'        => ['Guide', 'addCustomerForm', true],
+    'guide_customer_store'      => ['Guide', 'customerStore', true],
+    // Xóa KHÁCH HÀNG
+    'guide_customer_delete'     => ['Guide', 'customerDelete', true],
     // Điểm danh khách
-    'guide_checkin'          => ['Guide', 'checkin', true],
-    'guide_save_checkin'     => ['Guide', 'saveCheckin', true],
-
+    'guide_checkin'             => ['Guide', 'checkin', true],
+    'guide_save_checkin'        => ['Guide', 'saveCheckin', true],
     // Yêu cầu đặc biệt
-    'guide_special_request'        => ['Guide', 'specialRequest', true],
-    'guide_save_special_request'   => ['Guide', 'saveSpecialRequest', true],
-
+    'guide_special_request'     => ['Guide', 'specialRequest', true],
+    'guide_save_special_request'=> ['Guide', 'saveSpecialRequest', true],
     // NHẬT KÝ TOUR — DÙNG GuideDiaryController
-    'guide_diary'         => ['GuideDiary', 'index', true],
-    'guide_diary_add'     => ['GuideDiary', 'add', true],
-    'guide_diary_edit'    => ['GuideDiary', 'edit', true],
-    'guide_diary_store'    => ['GuideDiary', 'save', true],
-    'guide_diary_delete' => ['GuideDiary', 'delete', true],
+    'guide_diary'               => ['GuideDiary', 'index', true],
+    'guide_diary_add'           => ['GuideDiary', 'add', true],
+    'guide_diary_edit'          => ['GuideDiary', 'edit', true],
+    'guide_diary_store'         => ['GuideDiary', 'save', true],
+    'guide_diary_delete'        => ['GuideDiary', 'delete', true],
 
+    // --- BOOKING ROUTES (ĐÃ THÊM) ---
+    'booking_index'             => ['Booking', 'index', true], // Danh sách đặt chỗ
+    'booking_create'            => ['Booking', 'create', true], // Form tạo mới
+    'booking_store'             => ['Booking', 'store', true], // Xử lý lưu
+    'booking_show'              => ['Booking', 'show', true], // Chi tiết
+    'booking_edit'              => ['Booking', 'edit', true], // Form chỉnh sửa
+    'booking_update'            => ['Booking', 'update', true], // Xử lý cập nhật
+    'booking_delete'            => ['Booking', 'destroy', true], // Xử lý xóa
 ];
 
 
@@ -168,7 +168,7 @@ if (isset($routes[$action])) {
     exit(); // Dừng ứng dụng sau khi xử lý route thành công
 
 } else {
-    // Route không tồn tại: Chuyển hướng về Dashboard 
+    // Route không tồn tại: Chuyển hướng về Dashboard (route mặc định)
     header("Location: index.php?action=dashboard");
     exit();
 }

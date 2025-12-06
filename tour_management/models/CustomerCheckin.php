@@ -1,4 +1,5 @@
 <?php
+// models/CustomerCheckin.php
 
 class CustomerCheckin {
 
@@ -18,6 +19,7 @@ class CustomerCheckin {
         try {
             $tour_id = (int)$tour_id;
 
+            // Xử lý trường hợp không có điểm tập trung cụ thể
             if ($diem_tap_trung === null || trim($diem_tap_trung) === "") {
 
                 $sql = "
@@ -38,7 +40,7 @@ class CustomerCheckin {
                 $stmt->execute([$tour_id, $tour_id]);
 
             } else {
-
+                // Xử lý trường hợp có điểm tập trung
                 $sql = "
                     SELECT cc.customer_id, cc.trang_thai
                     FROM {$this->table} cc
@@ -57,6 +59,7 @@ class CustomerCheckin {
                 $stmt->execute([$tour_id, $diem_tap_trung, $tour_id, $diem_tap_trung]);
             }
 
+            // Tạo mảng map [customer_id => trang_thai]
             $map = [];
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $map[$row["customer_id"]] = $row["trang_thai"];
@@ -84,7 +87,7 @@ class CustomerCheckin {
             // Validate trạng thái
             $validStatus = ["Da_den", "Chua_den", "Vang"];
             if (!in_array($trang_thai, $validStatus)) {
-                $trang_thai = "Chua_den";
+                $trang_thai = "Chua_den"; // Default
             }
 
             // Giới hạn độ dài điểm tập trung
@@ -115,7 +118,7 @@ class CustomerCheckin {
 
 
     /**
-     * LỊCH SỬ CHECK-IN THEO TOUR
+     * LỊCH SỬ CHECK-IN THEO TOUR (JOIN với Tên khách hàng)
      */
     public function getHistoryByTour($tour_id){
         try {
