@@ -102,9 +102,13 @@
                                        class="btn btn-sm btn-danger">
                                         Xóa
                                     </a>
-                                    <a href="index.php?action=tour_assign_guide&id=<?= $tour['id']; ?>" 
-                                    class="btn btn-sm btn-success">Phân công HDV
-                                    </a>
+                                 <a href="index.php?action=guide_work_assign&tour_id=<?= $tour['id'] ?>" 
+   class="btn btn-sm btn-success">
+    Phân công HDV
+</a>
+
+
+
                                 </div>
 
                             </td>

@@ -107,40 +107,62 @@ class GuideController {
     ============================ */
     public function schedule() {
 
-        if (!isset($_GET['id'])) die("Thiếu ID hướng dẫn viên");
+    if (!isset($_GET['id'])) die("Thiếu ID hướng dẫn viên");
 
-        $guide_id = intval($_GET['id']);
+    $guide_id = intval($_GET['id']);
 
-        require_once "models/Guide.php";
-        require_once "models/GuideSchedule.php";
+    require_once "models/Guide.php";
+    require_once "models/GuideWork.php";
 
-        $guide = (new Guide($this->conn))->getById($guide_id);
-        $schedule = (new GuideSchedule($this->conn))->getScheduleByGuide($guide_id);
+    // Lấy thông tin hướng dẫn viên
+    $guide = (new Guide($this->conn))->getById($guide_id);
 
-        include "views/guides/schedule.php";
-    }
+    // Lấy tour được phân công từ bảng guide_tour
+    $schedule = (new GuideWork($this->conn))->getAssignedTours($guide_id);
+
+    include "views/guides/schedule.php";
+}
+
 
     /* ============================
       CHI TIẾT TOUR
     ============================ */
     public function tourDetail() {
 
-        if (!isset($_GET['tour_id']) || !isset($_GET['guide_id']))
-            die("Thiếu tour_id hoặc guide_id");
+    if (!isset($_GET['tour_id']) || !isset($_GET['guide_id']))
+        die("Thiếu tour_id hoặc guide_id");
 
-        $tour_id  = intval($_GET['tour_id']);
-        $guide_id = intval($_GET['guide_id']);
+    $tour_id  = intval($_GET['tour_id']);
+    $guide_id = intval($_GET['guide_id']);
 
-        require_once "models/Tour.php";
-        require_once "models/Booking.php";
-        require_once "models/Guide.php";
+    require_once "models/GuideWork.php";
+    require_once "models/Tour.php";
+    require_once "models/Booking.php";
 
-        $tour = (new Tour($this->conn))->getById($tour_id);
-        $guide = (new Guide($this->conn))->getById($guide_id);
-        $customers = (new Booking($this->conn))->getCustomersByTour($tour_id);
+    // Kiểm tra xem HDV có được phân công tour này không
+    $gw = new GuideWork($this->conn);
+    $assigned = $gw->getAssignedTours($guide_id);
 
-        include "views/guides/tour_detail.php";
+    $tour = null;
+    foreach ($assigned as $t) {
+        if ($t->tour_id == $tour_id) {
+            $tour = $t;
+            break;
+        }
     }
+
+    if (!$tour) {
+        $error = "HDV không được phân công tour này hoặc tour không tồn tại!";
+        require 'views/guides/tour_detail.php';
+        return;
+    }
+
+    // Lấy danh sách khách đi tour
+    $customers = (new Booking($this->conn))->getCustomersByTour($tour_id);
+
+    require 'views/guides/tour_detail.php';
+}
+
 
     /* ============================
       DANH SÁCH KHÁCH

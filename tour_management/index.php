@@ -134,6 +134,9 @@ $routes = [
     'guide_diary_store'    => ['GuideDiary', 'save', true],
     'guide_diary_delete' => ['GuideDiary', 'delete', true],
 
+    'guide_work_assign'       => ['GuideWork', 'assignForm', true],
+    'guide_work_assign_save'  => ['GuideWork', 'assignSave', true],
+
 ];
 
 

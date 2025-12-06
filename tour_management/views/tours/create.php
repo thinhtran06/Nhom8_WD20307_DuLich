@@ -18,6 +18,8 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label>Điểm khởi hành:</label>
+                    <input type="date" name="ngay_khoi_hanh" required>
+
                     <input type="text" name="diem_khoi_hanh" class="form-control" required>
                 </div>
             </div>

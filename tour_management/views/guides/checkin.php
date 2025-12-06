@@ -63,27 +63,30 @@
                         <tbody>
 
                         <?php foreach ($customers as $i => $c): ?>
-                            <?php
-                                if (is_object($c)) $c = (array)$c; // Ép object → array để tránh lỗi
+    <?php
+        if (is_object($c)) $c = (array)$c;
 
-                                $cid    = $c['customer_id'] ?? 0;
-                                $status = $statusMap[$cid] ?? 'Chua_den';
-                            ?>
-                            <tr>
-                                <td><?= $i + 1 ?></td>
-                                <td><?= htmlspecialchars($c['ho_ten'] ?? '') ?></td>
-                                <td><?= htmlspecialchars($c['dien_thoai'] ?? '') ?></td>
-                                <td><?= htmlspecialchars($c['ghi_chu'] ?? '') ?></td>
+        // LẤY ĐÚNG ID KHÁCH HÀNG
+        $cid = $c['id'] ?? 0;
 
-                                <td>
-                                    <select name="trang_thai[<?= $cid ?>]" class="form-select form-select-sm">
-                                        <option value="Da_den"   <?= $status === 'Da_den' ? 'selected' : '' ?>>Đã đến</option>
-                                        <option value="Chua_den" <?= $status === 'Chua_den' ? 'selected' : '' ?>>Chưa đến</option>
-                                        <option value="Vang"     <?= $status === 'Vang' ? 'selected' : '' ?>>Vắng</option>
-                                    </select>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
+        $status = $statusMap[$cid] ?? 'Chua_den';
+    ?>
+    <tr>
+        <td><?= $i + 1 ?></td>
+        <td><?= htmlspecialchars($c['ho_ten'] ?? '') ?></td>
+        <td><?= htmlspecialchars($c['dien_thoai'] ?? '') ?></td>
+        <td><?= htmlspecialchars($c['ghi_chu'] ?? '') ?></td>
+
+        <td>
+            <select name="trang_thai[<?= $cid ?>]" class="form-select form-select-sm">
+                <option value="Da_den"   <?= $status === 'Da_den' ? 'selected' : '' ?>>Đã đến</option>
+                <option value="Chua_den" <?= $status === 'Chua_den' ? 'selected' : '' ?>>Chưa đến</option>
+                <option value="Vang"     <?= $status === 'Vang' ? 'selected' : '' ?>>Vắng</option>
+            </select>
+        </td>
+    </tr>
+<?php endforeach; ?>
+
 
                         </tbody>
                     </table>
