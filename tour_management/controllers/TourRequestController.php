@@ -5,191 +5,148 @@ require_once 'models/TourRequest.php';
 
 class TourRequestController {
     
+    // Khai báo thuộc tính ở cấp độ Class (private)
     private $db;
-    private $request; // Model TourRequest
+    private $request; // Thuộc tính Model TourRequest
     
+    // Sửa Constructor để tự khởi tạo kết nối và Model
     public function __construct() {
+        // 1. Khởi tạo kết nối DB
         $database = new Database();
         $this->db = $database->getConnection();
+        
+        // 2. Khởi tạo Model 
         $this->request = new TourRequest($this->db);
     }
 
     // ------------------------------------------------------------------
-    // 1. DANH SÁCH YÊU CẦU TOUR
+    ## Hiển thị Danh sách và Chi tiết
     // ------------------------------------------------------------------
+    
+    /**
+     * Hiển thị danh sách yêu cầu (Action: tour_request_index)
+     */
     public function index() {
+        // Lấy dữ liệu thực tế từ Model
         $stmt = $this->request->getAll();
         $requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
         require_once 'views/tour_requests/index.php';
     }
 
-    // ------------------------------------------------------------------
-    // 2. HIỂN THỊ CHI TIẾT
-    // ------------------------------------------------------------------
-    public function detail() {
-        $id = $_GET['id'] ?? 0;
-        if (!$id || !is_numeric($id)) {
-            $_SESSION['error'] = "ID không hợp lệ!";
-            header("Location: index.php?action=tour_request_index");
-            exit;
-        }
-
-        $data = $this->request->findById($id);
-        if (!$data) {
-            $_SESSION['error'] = "Không tìm thấy yêu cầu tour!";
-            header("Location: index.php?action=tour_request_index");
-            exit;
-        }
-
-        $tourRequest = $data; // để view dùng biến $tourRequest
-        require_once 'views/tour_requests/detail.php';
-    }
-
-    // ------------------------------------------------------------------
-    // 3. XÓA YÊU CẦU
-    // ------------------------------------------------------------------
-    public function delete() {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['id'])) {
-            $_SESSION['error'] = "Yêu cầu không hợp lệ!";
-            header("Location: index.php?action=tour_request_index");
-            exit;
-        }
-
-        $id = (int)$_POST['id'];
-        if ($this->request->delete($id)) {
-            $_SESSION['success'] = "Xóa thành công!";
+    /**
+     * Hiển thị chi tiết yêu cầu (Action: tour_request_show)
+     */
+    public function show($id) {
+        $this->request->id = $id;
+        if($this->request->getById()) {
+            // Biến $this->request chứa dữ liệu đã load, dùng trong views/tour_requests/show.php
+            require_once 'views/tour_requests/show.php';
         } else {
-            $_SESSION['error'] = "Xóa thất bại!";
+            echo "Yêu cầu ID " . htmlspecialchars($id) . " không tồn tại.";
         }
-        header("Location: index.php?action=tour_request_index");
-        exit;
     }
 
     // ------------------------------------------------------------------
-    // 4. HIỂN THỊ FORM SỬA (GET)
+    ## CREATE (Tạo Yêu cầu Mới)
     // ------------------------------------------------------------------
-    public function edit() {
-        $id = $_GET['id'] ?? 0;
-        if (!$id || !is_numeric($id)) {
-            $_SESSION['error'] = "ID không hợp lệ!";
-            header("Location: index.php?action=tour_request_index");
-            exit;
-        }
 
-        $tourRequest = $this->request->findById($id);
-        if (!$tourRequest) {
-            $_SESSION['error'] = "Yêu cầu tour không tồn tại!";
-            header("Location: index.php?action=tour_request_index");
-            exit;
-        }
-
-        require_once 'views/tour_requests/edit.php';
-    }
-
-    // ------------------------------------------------------------------
-    // 5. XỬ LÝ CẬP NHẬT (POST) – ĐÃ FIX HOÀN TOÀN
-    // ------------------------------------------------------------------
-    public function update() {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: index.php?action=tour_request_index");
-            exit;
-        }
-
-        // LẤY ID TỪ FORM (bắt buộc có input hidden name="id")
-        $id = $_POST['id'] ?? 0;
-        if (!$id || !is_numeric($id)) {
-            $_SESSION['error'] = "ID yêu cầu không hợp lệ!";
-            header("Location: index.php?action=tour_request_index");
-            exit;
-        }
-
-        // KIỂM TRA BẢN GHI CÓ TỒN TẠI KHÔNG
-        if (!$this->request->findById($id)) {
-            $_SESSION['error'] = "Yêu cầu tour không tồn tại hoặc đã bị xóa!";
-            header("Location: index.php?action=tour_request_index");
-            exit;
-        }
-
-        // GÁN DỮ LIỆU VÀO MODEL
-        $this->request->id = (int)$id;
-        $this->request->ten_khach_hang     = trim($_POST['ten_khach_hang'] ?? '');
-        $this->request->dien_thoai         = trim($_POST['dien_thoai'] ?? '');
-        $this->request->email              = !empty(trim($_POST['email'] ?? '')) ? trim($_POST['email']) : null;
-        $this->request->so_luong_khach     = (int)($_POST['so_luong_khach'] ?? 1);
-        $this->request->diem_den_mong_muon = trim($_POST['diem_den_mong_muon'] ?? '');
-        $this->request->ngay_khoi_hanh_mong_luon = !empty($_POST['ngay_khoi_hanh_mong_luon']) ? $_POST['ngay_khoi_hanh_mong_luon'] : null;
-        $this->request->yeu_cau_chi_tiet   = trim($_POST['yeu_cau_chi_tiet'] ?? '') ?: null;
-        $this->request->trang_thai         = trim($_POST['trang_thai'] ?? 'Mới');
-
-        // XỬ LÝ NGÂN SÁCH (loại bỏ dấu phẩy, chấm)
-        $ngan_sach_raw = preg_replace('/[^0-9]/', '', $_POST['ngan_sach'] ?? '');
-        $this->request->ngan_sach = ($ngan_sach_raw === '' || $ngan_sach_raw === '0') ? null : (int)$ngan_sach_raw;
-
-        // THỰC HIỆN CẬP NHẬT
-        if ($this->request->update()) {
-            $_SESSION['success'] = "Cập nhật yêu cầu tour thành công!";
-        } else {
-            $_SESSION['error'] = "Cập nhật thất bại! Vui lòng thử lại.";
-        }
-
-        header("Location: index.php?action=tour_request_index");
-        exit;
-    }
-
-    // ------------------------------------------------------------------
-    // 6. TẠO MỚI – HIỂN THỊ FORM
-    // ------------------------------------------------------------------
+    /**
+     * Hiển thị form tạo yêu cầu mới (Action: tour_request_create)
+     */
     public function create() {
         require_once 'views/tour_requests/create.php';
     }
 
-    // ------------------------------------------------------------------
-    // 7. LƯU YÊU CẦU MỚI
-    // ------------------------------------------------------------------
+    /**
+     * Xử lý lưu yêu cầu tour mới (Action: tour_request_store)
+     */
     public function store() {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: index.php?action=tour_request_create");
-            exit;
-        }
+        if($_SERVER['REQUEST_METHOD'] === 'POST') {
+            
+            // Gán dữ liệu vào đối tượng Model ($this->request)
+            $this->request->ten_khach_hang = $_POST['ten_khach_hang'] ?? ''; 
+            $this->request->dien_thoai = $_POST['dien_thoai'] ?? '';
+            $this->request->so_luong_khach = $_POST['so_luong_khach'] ?? 1;
 
-        $this->request->ten_khach_hang     = trim($_POST['ten_khach_hang'] ?? '');
-        $this->request->dien_thoai         = trim($_POST['dien_thoai'] ?? '');
-        $this->request->email              = !empty(trim($_POST['email'] ?? '')) ? trim($_POST['email']) : null;
-        $this->request->so_luong_khach     = (int)($_POST['so_luong_khach'] ?? 1);
-        $this->request->diem_den_mong_muon = trim($_POST['diem_den_mong_muon'] ?? '');
-        $this->request->ngay_khoi_hanh_mong_luon = !empty($_POST['ngay_khoi_hanh_mong_luon']) ? $_POST['ngay_khoi_hanh_mong_luon'] : null;
-        $this->request->yeu_cau_chi_tiet   = trim($_POST['yeu_cau_chi_tiet'] ?? '') ?: null;
-        $this->request->trang_thai         = trim($_POST['trang_thai'] ?? 'Mới');
-
-        // Xử lý ngân sách
-        $ngan_sach_raw = preg_replace('/[^0-9]/', '', $_POST['ngan_sach'] ?? '');
-        $this->request->ngan_sach = ($ngan_sach_raw === '' || $ngan_sach_raw === '0') ? null : (int)$ngan_sach_raw;
-
-        if ($this->request->create()) {
-            $_SESSION['success'] = "Tạo yêu cầu tour thành công!";
-            header("Location: index.php?action=tour_request_index");
-        } else {
-            $_SESSION['error'] = "Lỗi khi lưu yêu cầu tour!";
-            header("Location: index.php?action=tour_request_create");
-        }
-        exit;
-    }
-
-    // ------------------------------------------------------------------
-    // 8. CẬP NHẬT TRẠNG THÁI (nếu cần dùng riêng)
-    // ------------------------------------------------------------------
-    public function updateStatus() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['trang_thai'])) {
-            $this->request->id = (int)$_POST['id'];
-            $new_status = trim($_POST['trang_thai']);
-            if ($this->request->updateStatus($new_status)) {
-                $_SESSION['success'] = "Cập nhật trạng thái thành công!";
+            // Xử lý các trường có thể là NULL trong DB
+            $this->request->email = $_POST['email'] ?? null;
+           $this->request->diem_den_mong_muon = $_POST['diem_den_mong_muon'] ?? null;
+            
+            // Xử lý Ngày khởi hành: Nếu rỗng ('') thì gán NULL
+            $this->request->ngay_khoi_hanh_mong_luon = !empty($_POST['ngay_khoi_hanh_mong_luon']) ? $_POST['ngay_khoi_hanh_mong_luon'] : null;
+            
+            // Xử lý Ngân sách: Nếu rỗng ('') thì gán NULL
+            $this->request->ngan_sach = !empty($_POST['ngan_sach']) ? $_POST['ngan_sach'] : null; 
+            
+            $this->request->yeu_cau_chi_tiet = $_POST['yeu_cau_chi_tiet'] ?? null;
+            $this->request->trang_thai = $_POST['trang_thai'] ?? 'Mới'; 
+            
+            if($this->request->create()) {
+                header("Location: index.php?action=tour_request_index&message=Tạo yêu cầu tour mới thành công!");
+                exit();
             } else {
-                $_SESSION['error'] = "Cập nhật trạng thái thất bại!";
+                // Quay lại form nếu lưu thất bại
+                header("Location: index.php?action=tour_request_create&message=Lỗi khi lưu yêu cầu tour! Vui lòng kiểm tra log.");
+                exit();
             }
         }
-        header("Location: index.php?action=tour_request_index");
-        exit;
+    }
+    
+    // ------------------------------------------------------------------
+    ## DELETE
+    // ------------------------------------------------------------------
+
+    /**
+     * Xóa yêu cầu (Action: tour_request_delete)
+     */
+    public function destroy($id) {
+        $this->request->id = $id;
+        if ($this->request->delete()) {
+            header("Location: index.php?action=tour_request_index&message=Đã xóa yêu cầu ID " . htmlspecialchars($id) . ".");
+        } else {
+            header("Location: index.php?action=tour_request_index&message=Lỗi khi xóa yêu cầu ID " . htmlspecialchars($id) . ".");
+        }
+        exit();
+    }
+    
+    // ------------------------------------------------------------------
+    ## Chức năng hỗ trợ (Tùy chọn)
+    // ------------------------------------------------------------------
+
+    /**
+     * Cập nhật trạng thái yêu cầu
+     */
+    public function updateStatus($id) {
+        // Cần thêm logic xử lý POST request để lấy trạng thái mới
+        // if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['trang_thai'])) {
+        //     $this->request->id = $id;
+        //     $new_status = $_POST['trang_thai'];
+        //     if ($this->request->updateStatus($new_status)) {
+        //         // Redirect hoặc thông báo thành công
+        //     }
+        // }
+    }
+    
+    /**
+     * Xử lý chuyển dữ liệu yêu cầu sang form tạo Tour chính thức
+     */
+    public function showCreateTourForm($request_id) {
+        // Logic chuyển đổi dữ liệu yêu cầu thành dữ liệu pre-fill cho TourController
+        $this->request->id = $request_id;
+        if($this->request->getById()) {
+            $_SESSION['prefill_tour_data'] = [
+                'ten_tour' => "Tour tùy chỉnh cho " . $this->request->ten_khach_hang,
+                'so_nguoi' => $this->request->so_luong_khach,
+                'ghi_chu' => "Yêu cầu gốc: " . $this->request->yeu_cau_chi_tiet,
+                // ... map các trường khác
+            ];
+            header("Location: index.php?action=tour_create&type=request&request_id=" . $request_id);
+            exit();
+        } else {
+            header("Location: index.php?action=tour_request_index&message=Không tìm thấy yêu cầu để chuyển đổi.");
+            exit();
+        }
     }
 }
 ?>

@@ -45,7 +45,7 @@
                     </div>
                     <div class="col-md-4 form-group">
                         <label>Ngày khởi hành mong muốn:</label>
-                        <input type="date" name="ngay_khoi_hanh_mong_luon" class="form-control">
+                        <input type="date" name="ngay_khoi_hanh_mong_muon" class="form-control">
                     </div>
                 </div>
                 
