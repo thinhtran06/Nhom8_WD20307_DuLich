@@ -168,5 +168,13 @@ $this->ngay_khoi_hanh = $this->ngay_khoi_hanh !== null
     $stmt = $this->conn->prepare($sql);
     return $stmt->execute([$so_nguoi, $tour_id]);
 }
+    public function find($id)
+{
+    $sql = "SELECT * FROM tours WHERE id = ?";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute([$id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
 
 }

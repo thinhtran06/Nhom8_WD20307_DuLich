@@ -62,15 +62,16 @@ class BookingController
         // 3. TẠO KHÁCH HÀNG TỰ ĐỘNG
         // =============================
         $customerData = [
-            "ho_ten"     => $_POST["customer_name"],
-            "dien_thoai" => $_POST["dien_thoai"],
-            "cmnd_cccd"  => $_POST["cmnd_cccd"],
-            "dia_chi"    => $_POST["dia_chi"],
-            "ngay_sinh"  => $_POST["ngay_sinh"],
-            "gioi_tinh"  => $_POST["gioi_tinh"] ?? null,
-            "quoc_tich"  => $_POST["quoc_tich"] ?? null,
-            "ghi_chu"    => $_POST["ghi_chu_khach"] ?? ""
-        ];
+    "ho_ten"     => $_POST["customer_name"] ?? '',
+    "dien_thoai" => $_POST["dien_thoai"]   ?? '',   // tránh undefined
+    "cmnd_cccd"  => $_POST["cmnd_cccd"]    ?? '',
+    "dia_chi"    => $_POST["dia_chi"]      ?? '',
+    "ngay_sinh"  => $_POST["ngay_sinh"]    ?? null,
+    "gioi_tinh"  => $_POST["gioi_tinh"]    ?? null,
+    "quoc_tich"  => $_POST["quoc_tich"]    ?? null,
+    "ghi_chu"    => $_POST["ghi_chu_khach"] ?? null
+];
+
 
         $customer_id = $this->customerModel->store($customerData);
         if (!$customer_id) die("❌ Lỗi tạo khách hàng!");

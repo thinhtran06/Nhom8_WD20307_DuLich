@@ -1,112 +1,51 @@
-<?php include "views/layout/header.php"; ?>
+<?php
+class Customer
+{
+    private $conn;
+    private $table = "customers";
 
-<style>
-    .page-title {
-        font-size: 26px;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 6px;
+    public function __construct($db)
+    {
+        $this->conn = $db;
     }
 
-    .info-box {
-        background: #f8f9fa;
-        padding: 12px 20px;
-        border-left: 4px solid #007bff;
-        border-radius: 6px;
-        margin-bottom: 20px;
-        font-size: 15px;
+    // Lấy 1 khách theo ID
+    public function getById($id)
+    {
+        $sql = "SELECT * FROM {$this->table} WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
-    .card-wrapper {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    // Lấy tất cả khách
+    public function getAll()
+    {
+        $sql = "SELECT * FROM {$this->table} ORDER BY id DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    table thead th {
-        background: #eef2f7 !important;
-        font-weight: 600;
+    // Tạo khách hàng mới => trả về ID mới tạo
+    public function store($data)
+    {
+        $sql = "INSERT INTO {$this->table}
+                (ho_ten, dien_thoai, cmnd_cccd, dia_chi, ngay_sinh, gioi_tinh, quoc_tich, ghi_chu)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([
+            $data['ho_ten']     ?? '',
+            $data['dien_thoai'] ?? '',
+            $data['cmnd_cccd']  ?? '',
+            $data['dia_chi']    ?? '',
+            $data['ngay_sinh']  ?? null,
+            $data['gioi_tinh']  ?? null,
+            $data['quoc_tich']  ?? null,
+            $data['ghi_chu']    ?? null,
+        ]);
+
+        return $this->conn->lastInsertId();
     }
-</style>
-
-<div class="main-content">
-
-    <!-- TITLE -->
-    <h1 class="page-title">
-        👥 Danh sách khách – 
-        <?= htmlspecialchars($tour->ten_tour ?? 'Tour không xác định') ?>
-    </h1>
-
-    <!-- INFO BOX -->
-    <div class="info-box">
-        <strong>Tour ID:</strong> <?= (int)$tour_id ?> &nbsp; | &nbsp;
-        <strong>Hướng dẫn viên ID:</strong> <?= (int)$guide_id ?>
-    </div>
-
-    <hr>
-
-    <!-- EMPTY STATE -->
-    <?php if (empty($customers)): ?>
-        <div class="alert alert-warning">
-            Không có khách nào trong tour này.
-        </div>
-        <a href="index.php?action=guide_schedule&id=<?= (int)$guide_id ?>" class="btn btn-secondary mt-3">
-            ⬅ Quay lại
-        </a>
-        <?php include "views/layout/footer.php"; return; ?>
-    <?php endif; ?>
-
-    <!-- TABLE WRAPPER -->
-    <div class="card-wrapper">
-
-        <table class="table table-bordered align-middle">
-            <thead>
-                <tr>
-                    <th style="width: 60px;">#</th>
-                    <th>Họ tên</th>
-                    <th>Điện thoại</th>
-                    <th>Email</th>
-                    <th>Giới tính</th>
-                    <th>Quốc tịch</th>
-                    <th>Ghi chú</th>
-                </tr>
-            </thead>
-
-            <tbody>
-            <?php foreach ($customers as $i => $c): ?>
-                <tr>
-                    <td><strong><?= $i + 1 ?></strong></td>
-
-                    <td><?= htmlspecialchars($c->ho_ten ?? '') ?></td>
-                    <td><?= htmlspecialchars($c->dien_thoai ?? '') ?></td>
-                    <td><?= htmlspecialchars($c->email ?? '') ?></td>
-
-                    <td>
-                        <?php if (($c->gioi_tinh ?? '') === 'Nam'): ?>
-                            <span class="badge bg-primary">Nam</span>
-                        <?php elseif (($c->gioi_tinh ?? '') === 'Nữ'): ?>
-                            <span class="badge bg-danger">Nữ</span>
-                        <?php else: ?>
-                            <span class="badge bg-secondary">Khác</span>
-                        <?php endif; ?>
-                    </td>
-
-                    <td><?= htmlspecialchars($c->quoc_tich ?? '') ?></td>
-
-                    <td><?= htmlspecialchars($c->ghi_chu ?? '') ?></td>
-                </tr>
-            <?php endforeach; ?>
-            </tbody>
-
-        </table>
-
-    </div>
-
-    <a href="index.php?action=guide_schedule&id=<?= (int)$guide_id ?>" class="btn btn-secondary mt-3">
-        ⬅ Quay lại
-    </a>
-
-</div>
-
-<?php include "views/layout/footer.php"; ?>
+}
