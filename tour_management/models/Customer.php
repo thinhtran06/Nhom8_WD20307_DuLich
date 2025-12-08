@@ -48,4 +48,21 @@ class Customer
 
         return $this->conn->lastInsertId();
     }
+     public function find($id) {
+        $stmt = $this->conn->prepare("SELECT * FROM customers WHERE id=?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_OBJ);
+    }
+
+    public function update($id, $data) {
+        $sql = "UPDATE customers SET ho_ten=?, email=?, dien_thoai=?, ghi_chu=? WHERE id=?";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute([
+            $data['ho_ten'],
+            $data['email'],
+            $data['dien_thoai'],
+            $data['ghi_chu'],
+            $id
+        ]);
+    }
 }

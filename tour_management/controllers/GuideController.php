@@ -379,6 +379,67 @@ class GuideController {
     header("Location: index.php?action=guide_customers&tour_id=$tour_id&guide_id=$guide_id");
     exit;
 }
+    public function customerEdit() {
+
+    if (!isset($_GET['customer_id']) || !isset($_GET['tour_id'])) {
+        die("Thiếu customer_id hoặc tour_id");
+    }
+
+    $customer_id = intval($_GET['customer_id']);
+    $tour_id = intval($_GET['tour_id']);
+    $guide_id = intval($_GET['guide_id']);
+
+    require_once "models/Customer.php";
+
+    $customerModel = new Customer($this->conn);
+    $customer = $customerModel->find($customer_id);
+
+    if (!$customer) {
+        die("Không tìm thấy khách hàng");
+    }
+
+    include "views/guides/customer_edit.php";
+}
+public function customerUpdate() {
+
+    require_once "models/Customer.php";
+
+    $customerModel = new Customer($this->conn);
+
+    $customerModel->update($_POST['customer_id'], [
+        'ho_ten' => $_POST['ho_ten'],
+        'email' => $_POST['email'],
+        'dien_thoai' => $_POST['dien_thoai'],
+        'gioi_tinh' => $_POST['gioi_tinh'],
+        'quoc_tich' => $_POST['quoc_tich'],
+        'ghi_chu' => $_POST['ghi_chu']
+    ]);
+
+    header("Location: index.php?action=guide_customers&tour_id={$_POST['tour_id']}&guide_id={$_POST['guide_id']}");
+    exit;
+}
+public function editCustomerForm() {
+
+    if (!isset($_GET['customer_id'])) {
+        die("Thiếu customer_id");
+    }
+
+    $customer_id = intval($_GET['customer_id']);
+    $tour_id     = intval($_GET['tour_id']);
+    $guide_id    = intval($_GET['guide_id']);
+
+    require_once "models/Customer.php";
+    $model = new Customer($this->conn);
+
+    $customer = $model->find($customer_id);
+
+    if (!$customer) {
+        die("Không tìm thấy khách hàng!");
+    }
+
+    // Truyền biến sang view
+    include "views/guides/customer_edit.php";
+}
 
 }
 ?>

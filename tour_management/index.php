@@ -112,12 +112,13 @@ $routes = [
     // Danh sách khách theo tour
     'guide_customers'        => ['Guide', 'customers', true],
 
-    //  THÊM  ĐỂ THÊM KHÁCH HÀNG
+    //  THÊM KHÁCH HÀNG
     'guide_customer_add'      => ['Guide', 'addCustomerForm', true],
     'guide_customer_store'    => ['Guide', 'customerStore', true],
-    //  Xóa  ĐỂ THÊM KHÁCH HÀNG
-
+    //  Xóa_Sửa   KHÁCH HÀNG
     'guide_customer_delete' => ['Guide', 'customerDelete', true],
+    'guide_customer_update' => ['Guide', 'customerUpdate', true],
+    'guide_customer_edit'   => ['Guide', 'editCustomerForm', true],
 
     // Điểm danh khách
     'guide_checkin'          => ['Guide', 'checkin', true],
