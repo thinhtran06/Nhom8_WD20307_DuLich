@@ -175,6 +175,13 @@ $this->ngay_khoi_hanh = $this->ngay_khoi_hanh !== null
     $stmt->execute([$id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
+public function getSchedule($tour_id)
+{
+    $sql = "SELECT * FROM tour_schedule WHERE tour_id = ? ORDER BY day_number ASC";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute([$tour_id]);
+    return $stmt->fetchAll(PDO::FETCH_OBJ);
+}
 
 
 }

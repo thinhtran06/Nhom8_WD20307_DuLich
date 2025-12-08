@@ -139,6 +139,7 @@ class GuideController {
     require_once "models/Tour.php";
     require_once "models/Booking.php";
 
+
     // Kiểm tra xem HDV có được phân công tour này không
     $gw = new GuideWork($this->conn);
     $assigned = $gw->getAssignedTours($guide_id);
@@ -159,6 +160,7 @@ class GuideController {
 
     // Lấy danh sách khách đi tour
     $customers = (new Booking($this->conn))->getCustomersByTour($tour_id);
+    $schedule = (new Tour($this->conn))->getSchedule($tour_id);
 
     require 'views/guides/tour_detail.php';
 }
