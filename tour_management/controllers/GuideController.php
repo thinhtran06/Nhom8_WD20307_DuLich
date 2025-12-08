@@ -367,19 +367,18 @@ class GuideController {
     }
 
     $tour_id = intval($_GET['tour_id']);
-    $guide_id = intval($_GET['guide_id']);
     $customer_id = intval($_GET['customer_id']);
+    $guide_id = intval($_GET['guide_id']);
 
     require_once "models/Booking.php";
     $bookingModel = new Booking($this->conn);
 
-    // XÓA BOOKING
-    $bookingModel->deleteCustomerFromTour($tour_id, $customer_id);
+    // HÀM ĐÚNG PHẢI LÀ removeCustomerFromTour
+    $bookingModel->removeCustomerFromTour($tour_id, $customer_id);
 
     header("Location: index.php?action=guide_customers&tour_id=$tour_id&guide_id=$guide_id");
     exit;
 }
-
 
 }
 ?>

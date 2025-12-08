@@ -116,6 +116,46 @@ class Booking
 
     return $stmt->fetchAll(PDO::FETCH_OBJ);
 }
+    public function addCustomer($data)
+{
+    // 1. Tạo khách hàng mới
+    $sqlCus = "INSERT INTO customers (ho_ten, email, dien_thoai, gioi_tinh, quoc_tich, ghi_chu)
+               VALUES (?, ?, ?, ?, ?, ?)";
+
+    $stmtCus = $this->conn->prepare($sqlCus);
+    $stmtCus->execute([
+        $data['ho_ten'],
+        $data['email'] ?? null,
+        $data['dien_thoai'] ?? null,
+        $data['gioi_tinh'] ?? null,
+        $data['quoc_tich'] ?? null,
+        $data['ghi_chu'] ?? null,
+    ]);
+
+    // Lấy ID khách vừa thêm
+    $customer_id = $this->conn->lastInsertId();
+
+    // 2. Thêm booking (mặc định: 1 khách)
+    $sqlBooking = "INSERT INTO bookings 
+        (tour_id, customer_id, user_id, loai_khach, ma_dat_tour, so_nguoi_lon, 
+         so_tre_em, tong_tien, da_thanh_toan, con_lai, trang_thai, ghi_chu)
+        VALUES (?, ?, NULL, 'Khách lẻ', ?, 1, 0, 0, 0, 0, 'Đã xác nhận', '')";
+
+    $stmtBooking = $this->conn->prepare($sqlBooking);
+    $stmtBooking->execute([
+        $data['tour_id'],
+        $customer_id,
+        uniqid('ADD_')
+    ]);
+
+    return true;
+}
+    public function removeCustomerFromTour($tour_id, $customer_id) {
+    $sql = "DELETE FROM bookings WHERE tour_id = ? AND customer_id = ?";
+    $stmt = $this->conn->prepare($sql);
+    return $stmt->execute([$tour_id, $customer_id]);
+}
+
 
 }
 
