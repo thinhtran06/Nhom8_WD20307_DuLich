@@ -154,4 +154,5 @@ public function getAllAttendanceLogsByBookingId($booking_id) {
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
 }

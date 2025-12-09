@@ -34,64 +34,110 @@ class BookingController {
     
     // --- 2. TẠO MỚI (CREATE) ---
     public function create() {
-        // ... (Giữ nguyên logic tạo mới) ...
-        $tours = $this->tour->getAll();
-        $customers = $this->customer->getAll(); 
         $error_message = null;
-        
         $success_message = $_SESSION['success_message'] ?? null;
         unset($_SESSION['success_message']); 
+        
+        // Tải lại dữ liệu cần thiết cho form (luôn chạy)
+        $tours = $this->tour->getAll();
+        $customers = $this->customer->getAll(); 
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
-            // 1. Lấy và làm sạch dữ liệu
-            $tour_id = htmlspecialchars(strip_tags($_POST['tour_id']));
-            $customer_id = htmlspecialchars(strip_tags($_POST['customer_id'])); 
-            $ngay_dat = htmlspecialchars(strip_tags($_POST['ngay_dat']));
-            $so_nguoi_lon = (int)htmlspecialchars(strip_tags($_POST['so_nguoi_lon']));
-            $so_tre_em = (int)htmlspecialchars(strip_tags($_POST['so_tre_em']));
-            $loai_khach = htmlspecialchars(strip_tags($_POST['loai_khach']));
-            $da_thanh_toan = (float)htmlspecialchars(strip_tags($_POST['da_thanh_toan'] ?? 0));
-            $trang_thai = htmlspecialchars(strip_tags($_POST['trang_thai']));
-            $ghi_chu = htmlspecialchars(strip_tags($_POST['ghi_chu'] ?? ''));
+            // Lấy dữ liệu từ POST
+            $data = $_POST;
 
-            // 2. Xử lý logic tính toán
-            $gia_tour_don_vi = $this->tour->getPriceById($tour_id);
-            $tong_tien = ($gia_tour_don_vi * $so_nguoi_lon) + ($gia_tour_don_vi * $so_tre_em * 0.5); 
-            $con_lai = $tong_tien - $da_thanh_toan;
-            $ma_dat_tour = 'BOOK_' . strtoupper(substr(md5(time()), 0, 5));
-            $user_id = $_SESSION['user_id'] ?? 1;
+            // Xử lý Transaction (đảm bảo atomic)
+            $this->db->beginTransaction(); 
+            try {
+                $customer_id = null;
+                
+                // 1. XỬ LÝ KHÁCH HÀNG ĐẠI DIỆN (Cũ HOẶC Mới)
+                
+                $ho_ten_khach = trim($data['ho_ten_khach'] ?? '');
+                $dien_thoai_khach = trim($data['dien_thoai_khach'] ?? '');
+                $cccd_khach = trim($data['cccd_khach'] ?? '');
+                
+                if (!empty($data['customer_id'])) {
+                    // TRƯỜNG HỢP 1: Khách hàng CŨ đã được chọn
+                    $customer_id = (int)htmlspecialchars(strip_tags($data['customer_id']));
+                    
+                } elseif (!empty($ho_ten_khach) && !empty($dien_thoai_khach) && !empty($cccd_khach)) {
+                    // TRƯỜNG HỢP 2: Khách hàng MỚI được nhập
+                    
+                    // Tạo khách hàng mới trong Customer Model
+                    $new_customer_data = [
+                        'ho_ten'     => htmlspecialchars(strip_tags($ho_ten_khach)),
+                        'dien_thoai' => htmlspecialchars(strip_tags($dien_thoai_khach)),
+                        'cmnd_cccd'  => htmlspecialchars(strip_tags($cccd_khach)),
+                        // Có thể thêm các trường khác như 'email' nếu có trong form
+                    ];
+                    
+                    $customer_id = $this->customer->createCustomer($new_customer_data); // Giả định hàm này trả về ID mới
+    
+                    if (!$customer_id) {
+                        throw new Exception("Không thể tạo hồ sơ khách hàng mới.");
+                    }
+    
+                } else {
+                    // TRƯỜNG HỢP 3: Lỗi - Không chọn khách cũ và cũng không nhập đủ khách mới
+                    throw new Exception("Vui lòng chọn Khách hàng đã tồn tại HOẶC nhập đầy đủ Họ Tên, CMND/CCCD và Điện Thoại khách hàng mới.");
+                }
 
-            // 3. Gán dữ liệu vào Booking Model 
-            $this->booking->tour_id = $tour_id;
-            $this->booking->customer_id = $customer_id;
-            $this->booking->ngay_dat = $ngay_dat;
-            $this->booking->so_nguoi_lon = $so_nguoi_lon;
-            $this->booking->so_tre_em = $so_tre_em;
-            $this->booking->loai_khach = $loai_khach;
-            $this->booking->trang_thai = $trang_thai;
-            $this->booking->ghi_chu = $ghi_chu;
-            $this->booking->ma_dat_tour = $ma_dat_tour; 
-            $this->booking->user_id = $user_id; 
-            $this->booking->tong_tien = $tong_tien; 
-            $this->booking->da_thanh_toan = $da_thanh_toan;
-            $this->booking->con_lai = $con_lai; 
-            
-            // 4. Thực thi tạo mới Booking
-            if ($this->booking->create()) {
+                // 2. TÍNH TOÁN VÀ CHUẨN BỊ DỮ LIỆU BOOKING
                 
-                $new_booking_id = $this->db->lastInsertId();
+                $tour_id = htmlspecialchars(strip_tags($data['tour_id']));
+                $ngay_dat = htmlspecialchars(strip_tags($data['ngay_khoi_hanh'])); // LƯU Ý: Đổi tên key để khớp với View đã sửa
+                $so_nguoi_lon = (int)htmlspecialchars(strip_tags($data['so_nguoi_lon']));
+                $so_tre_em = (int)htmlspecialchars(strip_tags($data['so_tre_em']));
+                $loai_khach = htmlspecialchars(strip_tags($data['loai_khach']));
+                $da_thanh_toan = (float)htmlspecialchars(strip_tags($data['da_thanh_toan'] ?? 0));
+                $trang_thai = htmlspecialchars(strip_tags($data['trang_thai']));
+                $ghi_chu = htmlspecialchars(strip_tags($data['ghi_chu'] ?? ''));
+
+                if (empty($ngay_dat) || $so_nguoi_lon <= 0) {
+                     throw new Exception("Ngày khởi hành hoặc Số người lớn không hợp lệ.");
+                }
                 
-                // 5. TẠO DANH SÁCH KHÁCH HÀNG CÁ NHÂN (TOUR_CUSTOMERS)
+                $gia_tour_don_vi = $this->tour->getPriceById($tour_id); // Giả định hàm này hoạt động
+                $tong_tien = ($gia_tour_don_vi * $so_nguoi_lon) + ($gia_tour_don_vi * $so_tre_em * 0.5); 
+                $con_lai = $tong_tien - $da_thanh_toan;
+                $ma_dat_tour = 'BOOK_' . strtoupper(substr(md5(time()), 0, 5));
+                $user_id = $_SESSION['user_id'] ?? 1;
+
+                // 3. Gán dữ liệu vào Booking Model và TẠO BOOKING
+                
+                $this->booking->tour_id = $tour_id;
+                $this->booking->customer_id = $customer_id; // ID Khách hàng Đại diện (Cũ hoặc Mới)
+                $this->booking->ngay_dat = $ngay_dat;
+                $this->booking->so_nguoi_lon = $so_nguoi_lon;
+                $this->booking->so_tre_em = $so_tre_em;
+                $this->booking->loai_khach = $loai_khach;
+                $this->booking->trang_thai = $trang_thai;
+                $this->booking->ghi_chu = $ghi_chu;
+                $this->booking->ma_dat_tour = $ma_dat_tour; 
+                $this->booking->user_id = $user_id; 
+                $this->booking->tong_tien = $tong_tien; 
+                $this->booking->da_thanh_toan = $da_thanh_toan;
+                $this->booking->con_lai = $con_lai; 
+                
+                $new_booking_id = $this->booking->create(); // Giả định hàm create() trả về ID mới
+                
+                if (!$new_booking_id) {
+                    throw new Exception("Tạo Booking thất bại khi gọi Model.");
+                }
+                
+                // 4. TẠO DANH SÁCH KHÁCH HÀNG CÁ NHÂN (TOUR_CUSTOMERS)
+                
                 $total_guests = $so_nguoi_lon + $so_tre_em;
                 $guest_created_count = 0;
 
-                // 5.1. Thêm Khách Hàng Đại Diện
+                // 4.1. Thêm Khách Hàng Đại Diện vào danh sách khách lẻ
                 if ($this->tourCustomer->createGuestEntry($new_booking_id, $customer_id)) {
                     $guest_created_count++;
                 }
                 
-                // 5.2. Thêm các Khách Hàng Placeholder còn lại
+                // 4.2. Thêm các Khách Hàng Placeholder còn lại
                 $remaining_guests = $total_guests - 1; 
                 
                 for ($i = 1; $i <= $remaining_guests; $i++) {
@@ -108,27 +154,28 @@ class BookingController {
                     }
                 }
                 
-                $final_message = "Tạo Booking thành công! (Mã: {$ma_dat_tour}). Đã tạo $guest_created_count / $total_guests hồ sơ khách hàng cá nhân.";
+                // Hoàn tất Transaction
+                $this->db->commit();
+                
+                // 5. Chuyển hướng thành công
+                $final_message = "Tạo Booking thành công! (Mã: **{$ma_dat_tour}**). Đã tạo $guest_created_count / $total_guests hồ sơ khách hàng cá nhân.";
                 $_SESSION['success_message'] = $final_message; 
                 header("Location: index.php?action=booking_create"); 
                 exit();
                 
-            } else {
-                $error_message = "Tạo Booking thất bại. Vui lòng kiểm tra lại dữ liệu và kết nối DB.";
+            } catch (Exception $e) {
+                // Xử lý lỗi (Rollback Transaction)
+                $this->db->rollBack();
+                $error_message = "Lỗi hệ thống khi tạo Booking: " . $e->getMessage();
             }
         }
 
         $page_title = "Tạo Booking Mới";
-        if (!isset($tours) || !isset($customers)) {
-            $tours = $this->tour->getAll();
-            $customers = $this->customer->getAll(); 
-        }
         require_once 'views/booking/create.php';
     }
 
     // --- 3. CHỈNH SỬA (UPDATE - EDIT) ---
     public function edit($id) {
-        // ... (Giữ nguyên logic chỉnh sửa chi tiết) ...
         $this->booking->id = htmlspecialchars(strip_tags($id));
         $error_message = null; 
         
@@ -249,9 +296,9 @@ class BookingController {
     
     // --- 6. CHỨC NĂNG ĐIỂM DANH KHÁCH HÀNG CÁ NHÂN (Individual Attendance) ---
     public function checkAttendance($id) {
-        // ... (Giữ nguyên logic điểm danh) ...
         $this->booking->id = htmlspecialchars(strip_tags($id));
         
+        // Tải lịch sử điểm danh (Giả định hàm này tồn tại)
         $attendance_history = $this->tourCustomer->getAllAttendanceLogsByBookingId($this->booking->id);
         $error_message = null; 
         
@@ -271,38 +318,48 @@ class BookingController {
             
             $activity_name = htmlspecialchars(strip_tags($_POST['activity_name'] ?? 'Điểm danh chung')); 
             
-            if (empty($activity_name)) {
-                $error_message = "Tên hoạt động điểm danh không được để trống!";
-            } else {
-                foreach ($_POST as $key => $value) {
-                    if (strpos($key, 'attendance_') === 0) {
-                        $tour_customer_id = str_replace('attendance_', '', $key);
-                        
-                        $is_present = ($value === 'Đã đến' || $value === '1') ? 1 : 0; 
-                        
-                        $notes = htmlspecialchars(strip_tags($_POST['notes_' . $tour_customer_id] ?? null));
-                        
-                        if ($this->tourCustomer->logAttendance($tour_customer_id, $activity_name, $is_present, $notes, $user_id)) {
-                            $updated_count++;
-                        } else {
-                            $failed_count++;
+            $this->db->beginTransaction(); // Bắt đầu Transaction cho việc ghi log
+            try {
+                if (empty($activity_name)) {
+                    throw new Exception("Tên hoạt động điểm danh không được để trống!");
+                } else {
+                    foreach ($_POST as $key => $value) {
+                        if (strpos($key, 'attendance_') === 0) {
+                            $tour_customer_id = str_replace('attendance_', '', $key);
+                            
+                            $is_present = ($value === 'Đã đến' || $value === '1') ? 1 : 0; 
+                            
+                            $notes = htmlspecialchars(strip_tags($_POST['notes_' . $tour_customer_id] ?? null));
+                            
+                            if ($this->tourCustomer->logAttendance($tour_customer_id, $activity_name, $is_present, $notes, $user_id)) {
+                                $updated_count++;
+                            } else {
+                                $failed_count++;
+                            }
                         }
                     }
+                    
+                    if ($failed_count > 0) {
+                         throw new Exception("Cảnh báo: Có $failed_count khách hàng ghi log thất bại.");
+                    }
                 }
+                $this->db->commit();
                 
                 if ($updated_count > 0) {
                     $_SESSION['success_message'] = "Đã ghi log điểm danh mới cho $updated_count khách hàng! Hoạt động: **$activity_name**";
                 }
-                if ($failed_count > 0) {
-                    $error_message = "Cảnh báo: Có $failed_count khách hàng ghi log thất bại.";
-                }
+                
+            } catch (Exception $e) {
+                $this->db->rollBack();
+                $error_message = $e->getMessage();
+                $_SESSION['error_message'] = $error_message;
             }
             
             header("Location: index.php?action=booking_attendance&id=$id"); 
             exit();
         }
 
-        // 3. Chuẩn bị dữ liệu cho View
+        // 3. Chuẩn bị dữ liệu cho View (GET request)
         $customer_data = $this->customer->getById($this->booking->customer_id);
         
         $this->booking->getById(); 
@@ -317,6 +374,7 @@ class BookingController {
             'tong_so_khach_model' => (int)$this->booking->so_nguoi_lon + (int)$this->booking->so_tre_em
         ];
         
+        // Lấy trạng thái điểm danh mới nhất của từng khách lẻ (Giả định hàm này tồn tại)
         $guests = $this->tourCustomer->getLatestAttendanceStatusByBookingId($this->booking->id);
 
         $page_title = "Điểm Danh Khách Hàng - Mã: " . $booking['ma_dat_tour'];

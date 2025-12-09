@@ -179,7 +179,7 @@ $isCategoryActive = in_array($currentAction, $categoryActions);
             </li>
             <li class="nav-item">
                 <a class="nav-link <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'hdv_') === 0) ? 'active' : ''; ?>" 
-                    href="index.php?action=hdv_index">
+                    href="index.php?action=guide_index">
                     👨‍💼 Quản Lý Hướng Dẫn Viên
                 </a>
             </li>
