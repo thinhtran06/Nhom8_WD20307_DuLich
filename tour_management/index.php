@@ -6,12 +6,12 @@
 // 1.1 Khởi tạo Session
 require_once 'config/session.php';
 // 1.2 Khởi tạo Kết nối Database (Cần thiết cho các Controllers/Models)
-require_once 'config/Database.php'; 
+require_once 'config/Database.php';
 
 
 // 1.3 Thiết lập Autoloading
 spl_autoload_register(function ($className) {
-    
+
     // Tải Controllers
     if (strpos($className, 'Controller') !== false) {
         $filePath = 'controllers/' . $className . '.php';
@@ -19,7 +19,7 @@ spl_autoload_register(function ($className) {
             require_once $filePath;
         }
     }
-    
+
     // Tải Models (Giả định Models nằm trong thư mục 'models/' và tên file = tên class)
     if (file_exists('models/' . $className . '.php')) {
         require_once 'models/' . $className . '.php';
@@ -48,15 +48,15 @@ $routes = [
 
     // --- Dashboard & Default Route (isProtected = true) ---
     ''                  => ['Dashboard', 'index', true],
-    'dashboard'         => ['Dashboard', 'index', true], 
+    'dashboard'         => ['Dashboard', 'index', true],
 
     // --- Tour Routes (isProtected = true) ---
     'tour_index'        => ['Tour', 'index', true],
-    
+
     // Các routes cho việc lọc tour theo loại (dùng listByLoaiTour)
-    'tour_trong_nuoc'   => ['Tour', 'listByLoaiTour', true], 
-    'tour_ngoai_nuoc'   => ['Tour', 'listByLoaiTour', true], 
-    
+    'tour_trong_nuoc'   => ['Tour', 'listByLoaiTour', true],
+    'tour_ngoai_nuoc'   => ['Tour', 'listByLoaiTour', true],
+
     'tour_create'       => ['Tour', 'create', true],
     'tour_store'        => ['Tour', 'store', true],
     'tour_show'         => ['Tour', 'show', true],
@@ -72,7 +72,7 @@ $routes = [
     'supplier_edit'     => ['Supplier', 'edit', true],
     'supplier_update'   => ['Supplier', 'update', true],
     'supplier_delete'   => ['Supplier', 'destroy', true],
-    
+
     // --- User Routes (isProtected = true) --- 
     'user_index'        => ['User', 'index', true],
     'user_create'       => ['User', 'create', true],
@@ -81,75 +81,72 @@ $routes = [
     'user_edit'         => ['User', 'edit', true],
     'user_update'       => ['User', 'update', true],
     'user_delete'       => ['User', 'destroy', true],
-    
+
     // --- Tour Request Routes (isProtected = true) ---
-    'tour_request_create'  => ['TourRequest', 'create', true], 
-    'tour_request_store'   => ['TourRequest', 'store', true], 
+    'tour_request_create'  => ['TourRequest', 'create', true],
+    'tour_request_store'   => ['TourRequest', 'store', true],
     'tour_request_index'   => ['TourRequest', 'index', true],
     'tour_request_show'    => ['TourRequest', 'show', true],
-    
+
     // 🌟 --- Booking Routes (CRUD & Thao tác) (isProtected = true) ---
     'booking_index'         => ['Booking', 'index', true],
     'booking_create'        => ['Booking', 'create', true],
     'booking_edit'          => ['Booking', 'edit', true],
     'booking_delete'        => ['Booking', 'delete', true],
-    
+
     // <--- CÁC ROUTES MỚI ĐƯỢC THÊM --->
     'booking_update_status' => ['Booking', 'updateStatus', true],   // Dùng cho form cập nhật trạng thái
     'booking_attendance'    => ['Booking', 'checkAttendance', true], // Dùng cho trang điểm danh chi tiết
     // <--- KẾT THÚC CÁC ROUTES MỚI --->
-    
+
     // 🌟 --- Attendance Routes (Tổng quan) (isProtected = true) ---
     // (Cần tạo AttendanceController.php với phương thức index)
-    'attendance_index'      => ['Attendance', 'index', true], 
-    
+    'attendance_index'      => ['Attendance', 'index', true],
+
     // Loại bỏ các route cũ không cần thiết, vì đã dùng 'booking_attendance'
     // 'attendance_list_bookings' => ['Attendance', 'listBookings', true], 
     // 'attendance_check'         => ['Attendance', 'checkAttendance', true],
-    
+
 ];
 
 
 // ==================== 4. Xử lý Route Chính ====================
 
-$action = isset($_GET['action']) ? $_GET['action'] : ''; 
+$action = isset($_GET['action']) ? $_GET['action'] : '';
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 
 if (isset($routes[$action])) {
     // Lấy thông tin Controller/Method từ Router Map
     list($controllerName, $method, $isProtected) = $routes[$action];
-    
+
     // 4.1 Kiểm tra Đăng nhập
     if ($isProtected) {
         // Giả định hàm requireLogin() đã được định nghĩa
         requireLogin();
     }
-    
+
     // 4.2 Khởi tạo Controller
     $controllerClass = $controllerName . 'Controller';
-    
+
     // Truyền đối tượng kết nối $conn vào constructor
     // Đảm bảo các Controller Class đã được định nghĩa (ví dụ: BookingController)
-    $controller = new $controllerClass($conn); 
-    
+    $controller = new $controllerClass($conn);
+
     // 4.3 Gọi phương thức tương ứng
     if ($method === 'listByLoaiTour') {
         // Xử lý logic lọc Tour: Xác định loại tour cần truyền vào Controller
         $loai_tour = ($action === 'tour_trong_nuoc') ? 'Trong nước' : 'Ngoài nước';
         $controller->$method($loai_tour);
-    } elseif (in_array($method, ['updateStatus', 'checkAttendance', 'edit', 'delete', 'show'])) {
-        // Gọi các phương thức cần truyền ID
+    } elseif (in_array($method, ['update', 'updateStatus', 'checkAttendance', 'edit', 'delete', 'show'])) {
         $controller->$method($id);
     } else {
-        // Gọi các phương thức không cần ID (index, create, store, destroy, v.v.)
         $controller->$method();
     }
-    
+
     exit(); // Dừng ứng dụng sau khi xử lý route thành công
-    
+
 } else {
     // Route không tồn tại: Chuyển hướng về Dashboard 
     header("Location: index.php?action=dashboard");
     exit();
 }
-?>

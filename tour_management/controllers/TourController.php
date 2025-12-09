@@ -83,7 +83,7 @@ class TourController {
             // >>> THÊM XỬ LÝ CHO TRƯỜNG LOẠI TOUR <<<
             $this->tour->loai_tour = $_POST['loai_tour'] ?? 'Trong nước';
             
-            $this->tour->ngay_khoi_hanh = $_POST['ngay_khoi_hanh'];
+            $this->tour->ngay_khoi_hanh = $_POST['ngay_khoi_hanh'] ?? null;
             $this->tour->so_ngay = $_POST['so_ngay'];
             $this->tour->gia_tour = $_POST['gia_tour'];
             $this->tour->so_cho = $_POST['so_cho'];

@@ -116,7 +116,7 @@ class Tour {
                          loai_tour=:loai_tour, 
                          ngay_khoi_hanh=:ngay_khoi_hanh, so_ngay=:so_ngay,
                          gia_tour=:gia_tour, so_cho=:so_cho, trang_thai=:trang_thai,
-                         lich_trinh=:lich_trinh  
+                         lich_trinh=:lich_trinh
                      WHERE id=:id"; 
 
         $stmt = $this->conn->prepare($query);
