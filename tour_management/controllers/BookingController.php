@@ -33,32 +33,83 @@ class BookingController {
     }
     
     // --- 2. TẠO MỚI (CREATE) ---
-    public function create() {
-        // ... (Giữ nguyên) ...
-        $tours = $this->tour->getAll();
-        $customers = $this->customer->getAll(); 
-        $error_message = null;
+   // controllers/BookingController.php
+
+// ... (các phương thức khác giữ nguyên)
+
+// --- 2. TẠO MỚI (CREATE) ---
+public function create() {
+    // 1. Chuẩn bị dữ liệu ban đầu
+    $tours = $this->tour->getAll(); // Cần re-run để render form lại
+    $customers = $this->customer->getAll(); // Cần re-run để render form lại
+    $error_message = null;
+    
+    $success_message = $_SESSION['success_message'] ?? null;
+    unset($_SESSION['success_message']); 
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
-        $success_message = $_SESSION['success_message'] ?? null;
-        unset($_SESSION['success_message']); 
+        // --- 1. Lấy và làm sạch dữ liệu ---
+        $tour_id = htmlspecialchars(strip_tags($_POST['tour_id']));
+        $customer_id = htmlspecialchars(strip_tags($_POST['customer_id']));
+        $ngay_dat = htmlspecialchars(strip_tags($_POST['ngay_dat']));
+        $so_nguoi_lon = htmlspecialchars(strip_tags($_POST['so_nguoi_lon']));
+        $so_tre_em = htmlspecialchars(strip_tags($_POST['so_tre_em']));
+        $loai_khach = htmlspecialchars(strip_tags($_POST['loai_khach']));
+        $da_thanh_toan = htmlspecialchars(strip_tags($_POST['da_thanh_toan'] ?? 0));
+        $trang_thai = htmlspecialchars(strip_tags($_POST['trang_thai']));
+        $ghi_chu = htmlspecialchars(strip_tags($_POST['ghi_chu'] ?? ''));
 
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // ... (Logic xử lý POST request) ...
-            
-            // 4. Thực thi tạo mới
-            if ($this->booking->create()) {
-                $_SESSION['success_message'] = "Tạo Booking thành công! (Mã: {$this->booking->ma_dat_tour})"; 
-                header("Location: index.php?action=booking_create"); 
-                exit();
-            } else {
-                $error_message = "Tạo Booking thất bại. Vui lòng kiểm tra lại dữ liệu.";
-            }
+        // --- 2. Xử lý logic tính toán và gán giá trị NOT NULL bắt buộc ---
+        
+        // Lấy giá tour (từ Tour Model)
+        $gia_tour_don_vi = $this->tour->getPriceById($tour_id);
+        
+        // Tính tổng tiền: (Giá tour * Người lớn) + (Giá tour * Trẻ em * 0.5) 
+        // Giả định trẻ em tính 50% giá người lớn
+        $tong_tien = ($gia_tour_don_vi * $so_nguoi_lon) + ($gia_tour_don_vi * $so_tre_em * 0.5);
+        
+        // Tính tiền còn lại
+        $con_lai = $tong_tien - $da_thanh_toan;
+        
+        // Tạo Mã Đặt Tour (Ví dụ đơn giản, bạn nên dùng hàm tạo mã phức tạp hơn)
+        $ma_dat_tour = 'BOOK_' . strtoupper(substr(md5(time()), 0, 5));
+        
+        // User ID của người đang tạo booking (Người dùng đang đăng nhập)
+        $user_id = $_SESSION['user_id'] ?? 1; // Mặc định là 1 nếu chưa đăng nhập
+
+        // --- 3. Gán dữ liệu vào Booking Model ---
+        $this->booking->tour_id = $tour_id;
+        $this->booking->customer_id = $customer_id;
+        $this->booking->ngay_dat = $ngay_dat;
+        $this->booking->so_nguoi_lon = $so_nguoi_lon;
+        $this->booking->so_tre_em = $so_tre_em;
+        $this->booking->loai_khach = $loai_khach;
+        $this->booking->trang_thai = $trang_thai;
+        $this->booking->ghi_chu = $ghi_chu;
+        
+        // Gán các trường NOT NULL đã tính toán
+        $this->booking->ma_dat_tour = $ma_dat_tour; // **MỚI**
+        $this->booking->user_id = $user_id;         // **MỚI**
+        $this->booking->tong_tien = $tong_tien;     // **MỚI**
+        $this->booking->da_thanh_toan = $da_thanh_toan;
+        $this->booking->con_lai = $con_lai;         // **MỚI**
+        
+        // --- 4. Thực thi tạo mới (Dòng gây lỗi 1048 lúc trước) ---
+        if ($this->booking->create()) {
+            $_SESSION['success_message'] = "Tạo Booking thành công! (Mã: {$ma_dat_tour})"; 
+            header("Location: index.php?action=booking_create"); 
+            exit();
+        } else {
+            $error_message = "Tạo Booking thất bại. Vui lòng kiểm tra lại dữ liệu.";
         }
-
-        $page_title = "Tạo Booking Mới";
-        require_once 'views/booking/create.php';
     }
 
+    $page_title = "Tạo Booking Mới";
+    require_once 'views/booking/create.php';
+}
+
+// ... (các phương thức khác giữ nguyên)
     // --- 3. CHỈNH SỬA (UPDATE - EDIT) ---
     public function edit($id) {
         // ... (Giữ nguyên) ...
