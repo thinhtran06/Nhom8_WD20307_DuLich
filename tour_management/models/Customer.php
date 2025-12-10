@@ -102,4 +102,37 @@ class Customer {
         }
         return false;
     }
+    public function find($id)
+{
+    $sql = "SELECT * FROM customers WHERE id = ?";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute([$id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+public function update($id, $data)
+{
+    $query = "UPDATE " . $this->table . " 
+              SET 
+                ho_ten = :ho_ten,
+                email = :email,
+                dien_thoai = :dien_thoai,
+                gioi_tinh = :gioi_tinh,
+                quoc_tich = :quoc_tich,
+                ghi_chu = :ghi_chu,
+                updated_at = NOW()
+              WHERE id = :id";
+
+    $stmt = $this->conn->prepare($query);
+
+    $stmt->bindParam(':ho_ten', $data['ho_ten']);
+    $stmt->bindParam(':email', $data['email']);
+    $stmt->bindParam(':dien_thoai', $data['dien_thoai']);
+    $stmt->bindParam(':gioi_tinh', $data['gioi_tinh']);
+    $stmt->bindParam(':quoc_tich', $data['quoc_tich']);
+    $stmt->bindParam(':ghi_chu', $data['ghi_chu']);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+    return $stmt->execute();
+}
+
 }

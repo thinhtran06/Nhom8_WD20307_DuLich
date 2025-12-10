@@ -147,14 +147,25 @@ class GuideController {
     ============================ */
     public function customers() {
 
-        if (!isset($_GET['tour_id'])) die("Thiếu tour_id");
+    if (!isset($_GET['tour_id'])) die("Thiếu tour_id");
+    if (!isset($_GET['guide_id'])) die("Thiếu guide_id");
 
-        require_once "models/Booking.php";
+    $tour_id = intval($_GET['tour_id']);
+    $guide_id = intval($_GET['guide_id']);
 
-        $customers = (new Booking($this->conn))->getCustomersByTour($_GET['tour_id']);
+    require_once "models/Booking.php";
+    require_once "models/Tour.php";
 
-        include "views/guides/customers.php";
-    }
+    // Lấy danh sách khách
+    $customers = (new Booking($this->conn))->getCustomersByTour($tour_id);
+
+    // Lấy thông tin tour
+    $tour = (new Tour($this->conn))->getById($tour_id);
+
+    // Truyền biến sang view
+    include "views/guides/customers.php";
+}
+
 
     /* ============================
       NHẬT KÝ TOUR
@@ -275,17 +286,25 @@ class GuideController {
     }
 
     /* ============================
-      THÊM KHÁCH HÀNG
+      CẬP NHẬT KHÁCH HÀNG
     ============================ */
-    public function addCustomerForm() {
+     public function customerUpdate() {
 
-        if (!isset($_GET['tour_id']) || !isset($_GET['guide_id']))
-            die("Thiếu tour_id hoặc guide_id");
+        require_once "models/Customer.php";
 
-        $tour_id = intval($_GET['tour_id']);
-        $guide_id = intval($_GET['guide_id']);
+        $customerModel = new Customer($this->conn);
 
-        include "views/guides/customer_add.php";
+        $customerModel->update($_POST['customer_id'], [
+            'ho_ten' => $_POST['ho_ten'],
+            'email' => $_POST['email'],
+            'dien_thoai' => $_POST['dien_thoai'],
+            'gioi_tinh' => $_POST['gioi_tinh'],
+            'quoc_tich' => $_POST['quoc_tich'],
+            'ghi_chu' => $_POST['ghi_chu']
+        ]);
+
+        header("Location: index.php?action=guide_customers&tour_id={$_POST['tour_id']}&guide_id={$_POST['guide_id']}");
+        exit;
     }
 
     /* ============================
@@ -333,19 +352,52 @@ class GuideController {
     }
 
     $tour_id = intval($_GET['tour_id']);
-    $guide_id = intval($_GET['guide_id']);
     $customer_id = intval($_GET['customer_id']);
+    $guide_id = intval($_GET['guide_id']);
 
     require_once "models/Booking.php";
     $bookingModel = new Booking($this->conn);
 
-    // XÓA BOOKING
-    $bookingModel->deleteCustomerFromTour($tour_id, $customer_id);
+    
+    $bookingModel->removeCustomerFromTour($tour_id, $customer_id);
 
     header("Location: index.php?action=guide_customers&tour_id=$tour_id&guide_id=$guide_id");
     exit;
 }
+/* ============================
+      Sửa KHÁCH KHỎI TOUR
+    ============================ */
+public function customerEdit() {
+        if (!isset($_GET['customer_id']) || !isset($_GET['tour_id'])) {
+            die("Thiếu customer_id hoặc tour_id");
+        }
 
+        $customer_id = intval($_GET['customer_id']);
+        $tour_id = intval($_GET['tour_id']);
+        $guide_id = intval($_GET['guide_id']);
+
+        require_once "models/Customer.php";
+
+        $customerModel = new Customer($this->conn);
+        $customer = $customerModel->find($customer_id);
+
+        include "views/guides/customer_edit.php";
+    }
+    /* ============================
+    THÊM KHÁCH HÀNG
+============================ */
+public function addCustomerForm() {
+
+    if (!isset($_GET['tour_id']) || !isset($_GET['guide_id'])) {
+        die("Thiếu tour_id hoặc guide_id");
+    }
+
+    $tour_id = intval($_GET['tour_id']);
+    $guide_id = intval($_GET['guide_id']);
+
+    include "views/guides/customer_add.php";
+}
 
 }
+
 ?>

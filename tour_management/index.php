@@ -126,7 +126,7 @@ $routes = [
     //  Xóa_Sửa   KHÁCH HÀNG
     'guide_customer_delete' => ['Guide', 'customerDelete', true],
     'guide_customer_update' => ['Guide', 'customerUpdate', true],
-    'guide_customer_edit'   => ['Guide', 'editCustomerForm', true],
+    'guide_customer_edit' => ['Guide', 'customerEdit', true],
 
     // Điểm danh khách
     'guide_checkin'          => ['Guide', 'checkin', true],

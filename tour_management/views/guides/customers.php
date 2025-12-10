@@ -1,66 +1,81 @@
 <?php include "views/layout/header.php"; ?>
 
-<?php
-$tour_id  = $_GET['tour_id'] ?? 0;
-$guide_id = $_GET['guide_id'] ?? 0;
-?>
+<div class="main-content container mt-4">
 
-<h3 class="mt-3">Danh sách khách trong đoàn</h3>
+    <div class="card shadow-sm">
+        <div class="card-header bg-white py-3">
+            <h4 class="mb-0">
+                👥 Danh sách khách trong tour 
+                <span class="text-primary">
+                    <?= htmlspecialchars($tour->ten_tour ?? ("#".$tour_id)) ?>
+                </span>
+            </h4>
+            <p><strong>Tour ID:</strong> <?= $tour_id ?> | <strong>HDV ID:</strong> <?= $guide_id ?></p>
 
-<a class="btn btn-success mb-3"
-   href="index.php?action=guide_customer_add&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">
-   + Thêm khách hàng
-</a>
+            <a href="index.php?action=guide_customer_add&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>" 
+               class="btn btn-success mb-3">
+                ➕ Thêm khách
+            </a>
+        </div>
 
-<div class="table-responsive mt-3">
-<table class="table table-bordered table-striped table-hover">
+        <div class="card-body">
 
-    <thead class="table-light">
-        <tr>
-            <th>Họ tên</th>
-            <th>Email</th>
-            <th>Điện thoại</th>
-            <th>Giới tính</th>
-            <th>Quốc tịch</th>
-            <th>Ghi chú</th>
-            <th>Hành động</th>
-        </tr>
-    </thead>
+            <?php if (empty($customers)): ?>
+                <div class="alert alert-warning">Không có khách nào.</div>
+                <a href="index.php?action=guide_schedule&id=<?= $guide_id ?>" class="btn btn-secondary">Quay lại</a>
+            <?php else: ?>
 
-    <tbody>
-<?php if (!empty($customers)): ?>
-    <?php foreach ($customers as $c): ?>
-        <tr>
-            <td><?= htmlspecialchars($c['ho_ten'] ?? '') ?></td>
-            <td><?= htmlspecialchars($c['email'] ?? '') ?></td>
-            <td><?= htmlspecialchars($c['dien_thoai'] ?? '') ?></td>
-            <td><?= htmlspecialchars($c['gioi_tinh'] ?? '') ?></td>
-            <td><?= htmlspecialchars($c['quoc_tich'] ?? '') ?></td>
-            <td><?= nl2br(htmlspecialchars($c['ghi_chu'] ?? '')) ?></td>
+                <table class="table table-bordered align-middle text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Họ tên</th>
+                            <th>Email</th>
+                            <th>Điện thoại</th>
+                            <th>Giới tính</th>
+                            <th>Quốc tịch</th>
+                            <th>Ghi chú</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
 
-
-            <td>
-                <a href="index.php?action=guide_customer_delete&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>&customer_id=<?= $c['customer_id'] ?>"
-                   class="btn btn-danger btn-sm"
-                   onclick="return confirm('Bạn chắc chắn muốn xóa khách này?');">
-                   Xóa
-                </a>
-            </td>
-        </tr>
-    <?php endforeach; ?>
-
-<?php else: ?>
-    <tr>
-        <td colspan="7" class="text-center">Không có khách nào.</td>
-    </tr>
-<?php endif; ?>
-</tbody>
+                    <tbody>
+                        <?php foreach ($customers as $i => $c): ?>
+                        <tr>
+                            <td><?= $i + 1 ?></td>
+                            <td><?= htmlspecialchars($c->ho_ten ?? '') ?></td>
+                            <td><?= htmlspecialchars($c->email ?? '') ?></td>
+                            <td><?= htmlspecialchars($c->dien_thoai ?? '') ?></td>
+                            <td><?= htmlspecialchars($c->gioi_tinh ?? '') ?></td>
+                            <td><?= htmlspecialchars($c->quoc_tich ?? '') ?></td>
+                            <td><?= htmlspecialchars($c->ghi_chu ?? '') ?></td>
 
 
+                            <td>
+                                <a href="index.php?action=guide_customer_edit&customer_id=<?= $c->id ?>&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>"
+                                   class="btn btn-warning btn-sm">
+                                   Sửa
+                                </a>
 
-</table>
+                                <a href="index.php?action=guide_customer_delete&customer_id=<?= $c->id ?>&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>"
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Bạn có chắc chắn muốn xóa khách này khỏi tour?');">
+                                   Xóa
+                                </a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+
+                </table>
+
+                <a href="index.php?action=guide_schedule&id=<?= $guide_id ?>" class="btn btn-secondary">Quay lại</a>
+
+            <?php endif; ?>
+
+        </div>
+    </div>
+
 </div>
-
-<a href="javascript:history.back();" class="btn btn-secondary mt-2">Quay lại</a>
 
 <?php include "views/layout/footer.php"; ?>
