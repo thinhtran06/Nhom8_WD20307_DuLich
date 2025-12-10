@@ -1,128 +1,131 @@
 <?php include "views/layout/header.php"; ?>
 
-<div class="main-content">
+<?php 
+if (!$guide) {
+    echo "<div class='alert alert-danger mt-4'>Không tìm thấy hướng dẫn viên.</div>";
+    echo "<a href='index.php?action=guide_index' class='btn btn-primary'>Quay lại</a>";
+    include "views/layout/footer.php";
+    exit;
+}
 
-    <!-- Tiêu đề trang -->
-    <h1 class="page-title">
-        <span class="emoji">🧑‍✈️</span>
-        Lịch làm việc của Hướng Dẫn Viên
-    </h1>
+$guide_id = (int)$guide->id;
+?>
+<div style="margin-left:260px; margin-top:30px; padding:20px;">
+<h3 class="mt-3">
+    Lịch làm việc của Hướng Dẫn Viên: 
+    <span class="text-primary fw-bold"><?= htmlspecialchars($guide->ho_ten ?? '') ?></span>
+</h3>
 
-    <!-- Thông tin HDV -->
-    <?php if (!$guide): ?>
-        <div class="alert alert-danger mt-4">Không tìm thấy hướng dẫn viên.</div>
-        <a href="index.php?action=guide_index" class="btn btn-primary">Quay lại</a>
-        </div>
-        <?php include "views/layout/footer.php"; exit; ?>
-    <?php endif; ?>
+<p class="text-muted">
+    <strong>Loại HDV:</strong> 
+    <span class="badge bg-info text-dark"><?= htmlspecialchars($guide->loai_hdv ?? '') ?></span>
 
-    <div class="card p-4 mb-4">
-        <h4 class="mb-2">
-            <strong><?= htmlspecialchars($guide->ho_ten ?? '') ?></strong>
-        </h4>
+    <strong class="ms-3">Chuyên tuyến:</strong> 
+    <span class="badge bg-primary"><?= htmlspecialchars($guide->chuyen_tuyen ?? '') ?></span>
 
-        <div class="text-muted">
-            <strong>Loại HDV:</strong> <?= htmlspecialchars($guide->loai_hdv ?? '') ?> |
-            <strong>Chuyên tuyến:</strong> <?= htmlspecialchars($guide->chuyen_tuyen ?? '') ?> |
-            <strong>Ngoại ngữ:</strong> <?= htmlspecialchars($guide->ngon_ngu ?? '') ?>
-        </div>
-    </div>
+    <strong class="ms-3">Ngoại ngữ:</strong> 
+    <span class="badge bg-secondary"><?= htmlspecialchars($guide->ngon_ngu ?? '') ?></span>
+</p>
 
-    <!-- Bảng lịch -->
-    <div class="table-wrapper">
-        <table class="table align-middle">
-            <thead>
+<hr>
+
+<div class="table-responsive">
+<table class="table table-bordered table-striped table-hover align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Tour</th>
+            <th>Ngày khởi hành</th>
+            <th>Ngày kết thúc</th>
+            <th>Nơi khởi hành</th>
+            <th>Điểm đến</th>
+            <th class="text-center" width="180">Thao tác</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <?php if (!empty($schedule)): ?>
+            <?php foreach ($schedule as $s): ?>
+
+                <?php
+                    if (!isset($s->tour_id)) continue;
+
+                    $start = $s->ngay_khoi_hanh;
+                    $so_ngay = max((int)$s->so_ngay - 1, 0);
+                    $end = date('Y-m-d', strtotime("$start +{$so_ngay} days"));
+
+                    $tour_id = (int)$s->tour_id;
+                ?>
+
                 <tr>
-                    <th>Tour</th>
-                    <th>Ngày khởi hành</th>
-                    <th>Ngày kết thúc</th>
-                    <th>Nơi khởi hành</th>
-                    <th>Điểm đến</th>
-                    <th width="250">Thao tác</th>
-                </tr>
-            </thead>
+                    <td><?= htmlspecialchars($s->ten_tour ?? '') ?></td>
+                    <td><?= htmlspecialchars($start) ?></td>
+                    <td><?= htmlspecialchars($end) ?></td>
+                    <td><?= htmlspecialchars($s->diem_khoi_hanh ?? '') ?></td>
+                    <td><?= htmlspecialchars($s->diem_den ?? '') ?></td>
 
-            <tbody>
-                <?php if (!empty($schedule)): ?>
-                    <?php foreach ($schedule as $s): ?>
+                    <td class="text-center">
 
-                        <?php
-                            $start = $s->ngay_khoi_hanh;
-                            $so_ngay = (int)$s->so_ngay;
-                            $end = date('Y-m-d', strtotime("$start +". max($so_ngay - 1, 0) ." days"));
-                        ?>
+                        <!-- Dropdown thao tác -->
+                        <div class="btn-group">
+    <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown">
+        Thao tác
+    </button>
 
-                        <tr>
-                            <td><?= htmlspecialchars($s->ten_tour ?? '') ?></td>
-                            <td><?= htmlspecialchars($start) ?></td>
-                            <td><?= htmlspecialchars($end) ?></td>
-                            <td><?= htmlspecialchars($s->diem_khoi_hanh ?? '') ?></td>
-                            <td><?= htmlspecialchars($s->diem_den ?? '') ?></td>
+    <ul class="dropdown-menu dropdown-menu-end">
 
-                            <td>
-    <div class="dropdown">
-        <button class="btn btn-sm btn-primary dropdown-toggle" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
-            Tác vụ
-        </button>
-        <ul class="dropdown-menu">
+        <li>
+            <a class="dropdown-item"
+                href="index.php?action=guide_tour_detail&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">
+                Chi tiết tour
+            </a>
+        </li>
 
-            <li>
-                <a class="dropdown-item"
-                   href="index.php?action=guide_tour_detail&tour_id=<?= $s->tour_id ?>&guide_id=<?= $guide_id ?>">
-                   📄 Chi tiết tour
-                </a>
-            </li>
+        <li>
+            <a class="dropdown-item"
+                href="index.php?action=guide_special_request&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">
+                Yêu cầu đặc biệt
+            </a>
+        </li>
 
-            <li>
-                <a class="dropdown-item"
-                   href="index.php?action=guide_diary&tour_id=<?= $s->tour_id ?>&guide_id=<?= $guide_id ?>">
-                   📘 Nhật ký tour
-                </a>
-            </li>
+        <li>
+            <a class="dropdown-item"
+                href="index.php?action=guide_diary&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">
+                Nhật ký tour
+            </a>
+        </li>
 
-            <li>
-                <a class="dropdown-item"
-                   href="index.php?action=guide_special_request&tour_id=<?= $s->tour_id ?>&guide_id=<?= $guide_id ?>">
-                   💡 Yêu cầu đặc biệt
-                </a>
-            </li>
+        <li>
+            <a class="dropdown-item"
+                href="index.php?action=guide_checkin&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">
+                Điểm danh
+            </a>
+        </li>
 
-            <li>
-                <a class="dropdown-item"
-                   href="index.php?action=guide_checkin&tour_id=<?= $s->tour_id ?>&guide_id=<?= $guide_id ?>">
-                   ✔️ Điểm danh
-                </a>
-            </li>
+        <li>
+            <a class="dropdown-item"
+                href="index.php?action=guide_customers&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">
+                Danh sách khách
+            </a>
+        </li>
 
-            <li>
-                <a class="dropdown-item"
-                   href="index.php?action=guide_customers&tour_id=<?= $s->tour_id ?>&guide_id=<?= $guide_id ?>">
-                   🧑‍🤝‍🧑 Danh sách khách
-                </a>
-            </li>
-
-        </ul>
-    </div>
-</td>
-
-                        </tr>
-
-                    <?php endforeach; ?>
-
-                <?php else: ?>
-                    <tr>
-                        <td colspan="6" class="text-center text-muted py-4">
-                            HDV chưa được phân công tour nào.
-                        </td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
-
-    <a href="index.php?action=guide_index" class="btn btn-secondary mt-3">← Quay lại</a>
-
+    </ul>
 </div>
 
+                    </td>
+                </tr>
+
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="6" class="text-center text-muted">
+                    HDV chưa được phân công tour nào.
+                </td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>
+</div>
+
+<a href="index.php?action=guide_index" class="btn btn-secondary mt-3">Quay lại</a>
+</div>
 <?php include "views/layout/footer.php"; ?>

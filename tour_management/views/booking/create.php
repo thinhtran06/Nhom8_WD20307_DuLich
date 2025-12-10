@@ -1,8 +1,10 @@
-<?php 
+<?php
 // views/booking/create.php
+
 // Giả định $tours và $customers là các đối tượng PDOStatement được truyền từ Controller
 
-require_once 'views/layout/header.php'; 
+require_once 'views/layout/header.php';
+
 ?>
 
 <div class="container mt-4 mb-5">
@@ -20,7 +22,8 @@ require_once 'views/layout/header.php';
     <?php endif; ?>
 
     <div class="card card-body shadow">
-        <form action="index.php?action=booking_create" method="POST">
+        <form action="index.php?action=booking_create" method="POST" id="bookingForm">
+            
             <h4 class="mb-3 text-primary"><i class="fas fa-info-circle"></i> Thông Tin Cơ Bản</h4>
             <div class="row">
                 
@@ -28,15 +31,15 @@ require_once 'views/layout/header.php';
                     <label for="tour_id" class="form-label">Tour (*)</label>
                     <select name="tour_id" id="tour_id" class="form-control" required>
                         <option value="">-- Chọn Tour --</option>
-                        <?php 
+                        <?php
                         // Giả định $tours là PDOStatement
                         if ($tours && $tours->rowCount() > 0):
                             while ($tour = $tours->fetch(PDO::FETCH_ASSOC)):
                         ?>
-                            <option value="<?php echo htmlspecialchars($tour['id']); ?>">
-                                <?php echo htmlspecialchars($tour['ten_tour']); ?> (ID: <?php echo htmlspecialchars($tour['id']); ?>)
-                            </option>
-                        <?php 
+                                <option value="<?php echo htmlspecialchars($tour['id']); ?>">
+                                    <?php echo htmlspecialchars($tour['ten_tour']); ?> (ID: <?php echo htmlspecialchars($tour['id']); ?>)
+                                </option>
+                        <?php
                             endwhile;
                         endif;
                         ?>
@@ -44,31 +47,10 @@ require_once 'views/layout/header.php';
                 </div>
                 
                 <div class="col-md-6 mb-3">
-                    <label for="customer_id" class="form-label">Khách Hàng Đại Diện (*)</label>
-                    <select name="customer_id" id="customer_id" class="form-control" required>
-                        <option value="">-- Chọn Khách Hàng --</option>
-                        <?php 
-                        // Giả định $customers là PDOStatement
-                        if ($customers && $customers->rowCount() > 0):
-                            // Dùng fetchAll() rồi lặp lại để giữ PDOStatement cho các mục đích khác (nếu cần)
-                            $customerList = $customers->fetchAll(PDO::FETCH_ASSOC);
-                            foreach ($customerList as $customer):
-                        ?>
-                            <option value="<?php echo htmlspecialchars($customer['id']); ?>">
-                                <?php echo htmlspecialchars($customer['ho_ten']); ?> (ID: <?php echo htmlspecialchars($customer['id']); ?>)
-                            </option>
-                        <?php 
-                            endforeach;
-                        endif;
-                        ?>
-                    </select>
+                    <label for="ngay_khoi_hanh" class="form-label">Ngày Khởi hành (*)</label>
+                    <input type="date" name="ngay_khoi_hanh" id="ngay_khoi_hanh" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
                 </div>
 
-                <div class="col-md-4 mb-3">
-                    <label for="ngay_dat" class="form-label">Ngày Khởi hành (*)</label>
-                    <input type="date" name="ngay_dat" id="ngay_dat" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
-                </div>
-                
                 <div class="col-md-4 mb-3">
                     <label for="so_nguoi_lon" class="form-label">Số Người Lớn (*)</label>
                     <input type="number" name="so_nguoi_lon" id="so_nguoi_lon" class="form-control" min="1" value="1" required>
@@ -78,15 +60,7 @@ require_once 'views/layout/header.php';
                     <label for="so_tre_em" class="form-label">Số Trẻ Em</label>
                     <input type="number" name="so_tre_em" id="so_tre_em" class="form-control" min="0" value="0">
                 </div>
-                
-                <div class="col-12 mb-4">
-                    <div class="alert alert-info py-2">
-                        <i class="fas fa-users"></i> **Tổng số khách:** Hệ thống sẽ tự động tạo **<?php echo isset($customerList) ? count($customerList) : 'N+1'; ?>** bản ghi khách hàng cá nhân (`tour_customers`) bằng tổng số Người Lớn và Trẻ Em, cộng với khách Đại diện.
-                    </div>
-                </div>
 
-                <h4 class="mb-3 mt-3 text-primary"><i class="fas fa-wallet"></i> Tài Chính & Trạng Thái</h4>
-                
                 <div class="col-md-4 mb-3">
                     <label for="loai_khach" class="form-label">Loại Khách</label>
                     <select name="loai_khach" id="loai_khach" class="form-control">
@@ -95,11 +69,65 @@ require_once 'views/layout/header.php';
                         <option value="VIP">VIP</option>
                     </select>
                 </div>
+            </div>
 
+            <hr>
+
+            <h4 class="mb-3 text-primary"><i class="fas fa-user-tie"></i> Khách Hàng Đại Diện</h4>
+            <div class="row">
+                
+                <div class="col-md-12 mb-3">
+                    <label for="customer_id" class="form-label">1. Chọn Khách Hàng Đã Tồn Tại</label>
+                    <select name="customer_id" id="customer_id" class="form-control">
+                        <option value="" selected>-- Chọn Khách Hàng (Để trống nếu tạo mới) --</option>
+                        <?php
+                        // Giả định $customers là PDOStatement
+                        if ($customers && $customers->rowCount() > 0):
+                            // Dùng fetchAll() và reset để tái sử dụng nếu cần
+                            $customerList = $customers->fetchAll(PDO::FETCH_ASSOC);
+                            foreach ($customerList as $customer):
+                        ?>
+                                <option value="<?php echo htmlspecialchars($customer['id']); ?>">
+                                    <?php echo htmlspecialchars($customer['ho_ten']); ?> (SĐT: <?php echo htmlspecialchars($customer['dien_thoai']); ?>)
+                                </option>
+                        <?php
+                            endforeach;
+                        endif;
+                        ?>
+                    </select>
+                    <small class="form-text text-muted">Nếu chọn, bỏ qua phần 2.</small>
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <h5 class="text-success mt-3"><i class="fas fa-plus-square"></i> 2. Hoặc Nhập Thông Tin Khách Hàng Mới (Tối Thiểu)</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="ho_ten_khach" class="form-label">Họ Tên Khách</label>
+                            <input type="text" name="ho_ten_khach" id="ho_ten_khach" class="form-control">
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="cccd_khach" class="form-label">CMND/CCCD</label>
+                            <input type="text" name="cccd_khach" id="cccd_khach" class="form-control">
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="dien_thoai_khach" class="form-label">Điện Thoại</label>
+                            <input type="tel" name="dien_thoai_khach" id="dien_thoai_khach" class="form-control">
+                        </div>
+                    </div>
+                    <small class="form-text text-muted">Nếu nhập thông tin mới, phải để trống mục 1.</small>
+                </div>
+            </div> 
+            
+            <hr>
+
+            <h4 class="mb-3 mt-3 text-primary"><i class="fas fa-wallet"></i> Tài Chính & Trạng Thái</h4>
+            <div class="row">
                 <div class="col-md-4 mb-3">
                     <label for="da_thanh_toan" class="form-label">Đã Thanh Toán (VNĐ)</label>
                     <input type="number" name="da_thanh_toan" id="da_thanh_toan" class="form-control" min="0" value="0">
-                    <small class="form-text text-muted">Số tiền khách đã trả ban đầu. Tổng tiền sẽ được tính tự động sau.</small>
+                    <small class="form-text text-muted">Số tiền khách đã trả ban đầu.</small>
                 </div>
                 
                 <div class="col-md-4 mb-3">
@@ -116,6 +144,10 @@ require_once 'views/layout/header.php';
                     <textarea name="ghi_chu" id="ghi_chu" class="form-control" rows="3"></textarea>
                 </div>
             </div>
+
+            <div class="alert alert-info py-2">
+                <i class="fas fa-users"></i> **Tổng số khách:** Hệ thống sẽ dựa trên **Số Người Lớn** và **Số Trẻ Em** để tạo bản ghi khách lẻ (`tour_customers`). Khách Đại Diện (mục 1 hoặc 2) sẽ là bản ghi đầu tiên.
+            </div>
             
             <button type="submit" class="btn btn-primary btn-lg">
                 <i class="fas fa-save"></i> Lưu Booking
@@ -124,6 +156,6 @@ require_once 'views/layout/header.php';
     </div>
 </div>
 
-<?php 
-require_once 'views/layout/footer.php'; 
+<?php
+require_once 'views/layout/footer.php';
 ?>

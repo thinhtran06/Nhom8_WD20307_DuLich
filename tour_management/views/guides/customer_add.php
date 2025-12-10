@@ -1,62 +1,68 @@
 <?php include "views/layout/header.php"; ?>
 
+<?php
+$tour_id  = $_GET['tour_id'] ?? 0;
+$guide_id = $_GET['guide_id'] ?? 0;
+
+if (!$tour_id || !$guide_id) {
+    die("<b>Lỗi:</b> Thiếu tour_id hoặc guide_id");
+}
+?>
+
 <div class="container mt-4">
+    <h3>➕ Thêm khách hàng vào tour</h3>
 
-    <div class="card shadow p-4">
+    <div class="card mt-3">
+        <div class="card-body">
 
-        <h3 class="mb-4">
-            <span style="font-size: 28px; color:#5a5aff;">➕</span> 
-            Thêm khách vào tour
-        </h3>
+            <form method="POST" action="index.php?action=guide_customer_store">
 
-        <form action="index.php?action=guide_customer_store" method="POST">
+                <input type="hidden" name="tour_id" value="<?= $tour_id ?>">
+                <input type="hidden" name="guide_id" value="<?= $guide_id ?>">
 
-            <input type="hidden" name="tour_id" value="<?= $tour_id ?>">
-            <input type="hidden" name="guide_id" value="<?= $guide_id ?>">
+                <div class="form-group mb-3">
+                    <label><strong>Họ tên khách *</strong></label>
+                    <input type="text" name="ho_ten" class="form-control" required>
+                </div>
 
-            <div class="mb-3">
-                <label class="form-label">Họ tên</label>
-                <input type="text" name="ho_ten" class="form-control" required>
-            </div>
+                <div class="form-group mb-3">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control">
+                </div>
 
-            <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control">
-            </div>
+                <div class="form-group mb-3">
+                    <label>Điện thoại</label>
+                    <input type="text" name="dien_thoai" class="form-control">
+                </div>
 
-            <div class="mb-3">
-                <label class="form-label">Điện thoại</label>
-                <input type="text" name="dien_thoai" class="form-control">
-            </div>
+                <div class="form-group mb-3">
+                    <label>Giới tính</label>
+                    <select name="gioi_tinh" class="form-control">
+                        <option value="Nam">Nam</option>
+                        <option value="Nữ">Nữ</option>
+                        <option value="Khác">Khác</option>
+                    </select>
+                </div>
 
-            <div class="mb-3">
-                <label class="form-label">Giới tính</label>
-                <select name="gioi_tinh" class="form-control">
-                    <option value="">-- Chọn --</option>
-                    <option value="Nam">Nam</option>
-                    <option value="Nữ">Nữ</option>
-                    <option value="Khác">Khác</option>
-                </select>
-            </div>
+                <div class="form-group mb-3">
+                    <label>Quốc tịch</label>
+                    <input type="text" name="quoc_tich" class="form-control" value="VN">
+                </div>
 
-            <div class="mb-3">
-                <label class="form-label">Quốc tịch</label>
-                <input type="text" name="quoc_tich" class="form-control">
-            </div>
+                <div class="form-group mb-3">
+                    <label>Ghi chú</label>
+                    <textarea name="ghi_chu" class="form-control"></textarea>
+                </div>
 
-            <div class="mb-3">
-                <label class="form-label">Ghi chú</label>
-                <textarea name="ghi_chu" class="form-control" rows="3"></textarea>
-            </div>
+                <button type="submit" class="btn btn-success">Lưu khách hàng</button>
 
-            <div class="mt-3">
-                <button class="btn btn-primary">💾 Lưu khách</button>
                 <a href="index.php?action=guide_customers&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>" 
-                   class="btn btn-secondary ms-2">Hủy</a>
-            </div>
+                   class="btn btn-secondary">
+                   Quay lại
+                </a>
 
-        </form>
-
+            </form>
+        </div>
     </div>
 </div>
 

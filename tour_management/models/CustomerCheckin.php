@@ -1,4 +1,6 @@
 <?php
+// models/CustomerCheckin.php
+
 class CustomerCheckin {
 
     private $conn;
@@ -9,66 +11,135 @@ class CustomerCheckin {
     }
 
     /**
-     * Lấy trạng thái MỚI NHẤT của từng khách trong 1 tour
-     * Nếu có truyền điểm tập trung thì lọc theo điểm đó
+     * LẤY TRẠNG THÁI MỚI NHẤT CỦA TỪNG KHÁCH THEO TOUR & ĐIỂM TẬP TRUNG
+     * Tối ưu bằng cách GROUP BY (chỉ lấy dòng mới nhất mỗi khách)
      */
     public function getLatestStatusesByTourAndPoint($tour_id, $diem_tap_trung = null) {
-        if ($diem_tap_trung === null || $diem_tap_trung === '') {
-            $sql = "SELECT customer_id, trang_thai 
-                    FROM {$this->table}
-                    WHERE tour_id = ?
-                    ORDER BY thoi_gian DESC";
-            $params = [$tour_id];
-        } else {
-            $sql = "SELECT customer_id, trang_thai 
-                    FROM {$this->table}
-                    WHERE tour_id = ? AND diem_tap_trung = ?
-                    ORDER BY thoi_gian DESC";
-            $params = [$tour_id, $diem_tap_trung];
-        }
 
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute($params);
+        try {
+            $tour_id = (int)$tour_id;
 
-        $map = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            if (!isset($map[$row['customer_id']])) {
-                $map[$row['customer_id']] = $row['trang_thai'];
+            // Xử lý trường hợp không có điểm tập trung cụ thể
+            if ($diem_tap_trung === null || trim($diem_tap_trung) === "") {
+
+                $sql = "
+                    SELECT cc.customer_id, cc.trang_thai
+                    FROM {$this->table} cc
+                    INNER JOIN (
+                        SELECT customer_id, MAX(thoi_gian) AS latest_time
+                        FROM {$this->table}
+                        WHERE tour_id = ?
+                        GROUP BY customer_id
+                    ) t ON 
+                        t.customer_id = cc.customer_id
+                        AND t.latest_time = cc.thoi_gian
+                    WHERE cc.tour_id = ?
+                ";
+
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$tour_id, $tour_id]);
+
+            } else {
+                // Xử lý trường hợp có điểm tập trung
+                $sql = "
+                    SELECT cc.customer_id, cc.trang_thai
+                    FROM {$this->table} cc
+                    INNER JOIN (
+                        SELECT customer_id, MAX(thoi_gian) AS latest_time
+                        FROM {$this->table}
+                        WHERE tour_id = ? AND diem_tap_trung = ?
+                        GROUP BY customer_id
+                    ) t ON 
+                        t.customer_id = cc.customer_id
+                        AND t.latest_time = cc.thoi_gian
+                    WHERE cc.tour_id = ? AND cc.diem_tap_trung = ?
+                ";
+
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([$tour_id, $diem_tap_trung, $tour_id, $diem_tap_trung]);
             }
+
+            // Tạo mảng map [customer_id => trang_thai]
+            $map = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $map[$row["customer_id"]] = $row["trang_thai"];
+            }
+
+            return $map;
+
+        } catch (PDOException $e) {
+            error_log("Checkin latest status error: " . $e->getMessage());
+            return [];
         }
-        return $map;
     }
 
+
     /**
-     * Lưu 1 bản ghi checkin (ghi lịch sử)
+     * LƯU 1 DÒNG CHECK-IN (GHI LỊCH SỬ)
      */
     public function upsert($tour_id, $customer_id, $guide_id, $diem_tap_trung, $trang_thai){
-        $sql = "INSERT INTO {$this->table}
-                (tour_id, customer_id, guide_id, diem_tap_trung, trang_thai, thoi_gian)
-                VALUES (?,?,?,?,?,NOW())";
 
-        $stmt = $this->conn->prepare($sql);
-        return $stmt->execute([
-            $tour_id,
-            $customer_id,
-            $guide_id,
-            $diem_tap_trung,
-            $trang_thai
-        ]);
+        try {
+            $tour_id     = (int)$tour_id;
+            $customer_id = (int)$customer_id;
+            $guide_id    = (int)$guide_id;
+
+            // Validate trạng thái
+            $validStatus = ["Da_den", "Chua_den", "Vang"];
+            if (!in_array($trang_thai, $validStatus)) {
+                $trang_thai = "Chua_den"; // Default
+            }
+
+            // Giới hạn độ dài điểm tập trung
+            $diem_tap_trung = trim($diem_tap_trung);
+            if (strlen($diem_tap_trung) > 100) {
+                $diem_tap_trung = substr($diem_tap_trung, 0, 100);
+            }
+
+            $sql = "INSERT INTO {$this->table}
+                    (tour_id, customer_id, guide_id, diem_tap_trung, trang_thai, thoi_gian)
+                    VALUES (?, ?, ?, ?, ?, NOW())";
+
+            $stmt = $this->conn->prepare($sql);
+
+            return $stmt->execute([
+                $tour_id,
+                $customer_id,
+                $guide_id,
+                $diem_tap_trung,
+                $trang_thai
+            ]);
+
+        } catch (PDOException $e) {
+            error_log("Checkin upsert error: " . $e->getMessage());
+            return false;
+        }
     }
 
+
     /**
-     * Lịch sử check-in của 1 tour
+     * LỊCH SỬ CHECK-IN THEO TOUR (JOIN với Tên khách hàng)
      */
-    public function getHistoryByTour($tour_id) {
-        $sql = "SELECT cc.*, c.ho_ten
+    public function getHistoryByTour($tour_id){
+        try {
+            $tour_id = (int)$tour_id;
+
+            $sql = "
+                SELECT cc.*, c.ho_ten
                 FROM {$this->table} cc
                 JOIN customers c ON c.id = cc.customer_id
                 WHERE cc.tour_id = ?
-                ORDER BY cc.thoi_gian DESC";
+                ORDER BY cc.thoi_gian DESC
+            ";
 
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$tour_id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$tour_id]);
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        } catch (PDOException $e) {
+            error_log("Checkin history error: " . $e->getMessage());
+            return [];
+        }
     }
 }

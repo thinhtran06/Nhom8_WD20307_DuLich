@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Tour Du Lịch</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <style>
         body { padding: 20px; }
         .container { max-width: 1200px; }
@@ -171,7 +169,14 @@ $isCategoryActive = in_array($currentAction, $categoryActions);
                     🎫 Quản Lý Đặt Chỗ
                 </a>
             </li>
-
+            </li>
+            
+       <li class="nav-item">
+ <a class="nav-link <?php echo (isset($_GET['action']) && $_GET['action'] == 'attendance_index') ? 'active' : ''; ?>" 
+                    href="index.php?action=attendance_index">
+                    📋 Quản Lý Điểm Danh
+                </a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'hdv_') === 0) ? 'active' : ''; ?>" 
                     href="index.php?action=guide_index">

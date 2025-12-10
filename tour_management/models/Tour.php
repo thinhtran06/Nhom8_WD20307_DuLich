@@ -11,7 +11,7 @@ class Tour {
     public $mo_ta;
     public $diem_khoi_hanh;
     public $diem_den;
-    public $loai_tour; // THÊM: Thuộc tính mới
+    public $loai_tour;
     public $ngay_khoi_hanh;
     public $so_ngay;
     public $gia_tour;
@@ -24,7 +24,7 @@ class Tour {
         $this->conn = $db;
     }
 
-    // --- PHƯƠNG THỨC CRUD ---
+    // --- PHƯƠNG THỨC CRUD CƠ BẢN ---
 
     // 1. Lấy tất cả tour
     public function getAll() {
@@ -35,48 +35,67 @@ class Tour {
     }
 
     // 2. Lấy tour theo ID
- public function getById() {
-    $query = "SELECT * FROM " . $this->table . " WHERE id = ? LIMIT 1";
-    $stmt = $this->conn->prepare($query);
-    $stmt->bindParam(1, $this->id);
-    $stmt->execute();
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    public function getById() {
+        $query = "SELECT * FROM " . $this->table . " WHERE id = ? LIMIT 0,1";
 
-    return $row ?: false; 
-}
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $this->id);
+        $stmt->execute();
 
-    // 3. Tạo tour mới (CẬP NHẬT: Thêm loai_tour)
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($row) {
+            $this->ten_tour = $row['ten_tour'];
+            $this->mo_ta = $row['mo_ta'];
+            $this->diem_khoi_hanh = $row['diem_khoi_hanh'];
+            $this->diem_den = $row['diem_den'];
+            $this->loai_tour = $row['loai_tour']; 
+            $this->ngay_khoi_hanh = $row['ngay_khoi_hanh'];
+            $this->so_ngay = $row['so_ngay'];
+            $this->gia_tour = $row['gia_tour'];
+            $this->so_cho = $row['so_cho'];
+            $this->trang_thai = $row['trang_thai'];
+            $this->lich_trinh = $row['lich_trinh'];
+            return $stmt; // Trả về stmt để Controller có thể fetch dữ liệu
+        }
+        return false;
+    }
+
+    // 3. Tạo tour mới (ĐÃ CÂN CHỈNH LẠI LOGIC XỬ LÝ NULL)
     public function create() {
         $query = "INSERT INTO " . $this->table . " 
-                  SET ten_tour=:ten_tour, mo_ta=:mo_ta, 
-                      diem_khoi_hanh=:diem_khoi_hanh, diem_den=:diem_den,
-                      loai_tour=:loai_tour, -- THÊM VÀO TRUY VẤN
-                      ngay_khoi_hanh=:ngay_khoi_hanh, so_ngay=:so_ngay,
-                      gia_tour=:gia_tour, so_cho=:so_cho, trang_thai=:trang_thai, 
-                      lich_trinh=:lich_trinh"; 
+                     SET ten_tour=:ten_tour, mo_ta=:mo_ta, 
+                         diem_khoi_hanh=:diem_khoi_hanh, diem_den=:diem_den,
+                         loai_tour=:loai_tour, 
+                         ngay_khoi_hanh=:ngay_khoi_hanh, so_ngay=:so_ngay,
+                         gia_tour=:gia_tour, so_cho=:so_cho, trang_thai=:trang_thai, 
+                         lich_trinh=:lich_trinh"; 
 
         $stmt = $this->conn->prepare($query);
 
-        // Làm sạch và Bind dữ liệu
+        // Làm sạch dữ liệu
         $this->ten_tour = htmlspecialchars(strip_tags($this->ten_tour));
         $this->mo_ta = htmlspecialchars(strip_tags($this->mo_ta));
         $this->diem_khoi_hanh = htmlspecialchars(strip_tags($this->diem_khoi_hanh));
         $this->diem_den = htmlspecialchars(strip_tags($this->diem_den));
-        $this->loai_tour = htmlspecialchars(strip_tags($this->loai_tour)); // BIND THUỘC TÍNH MỚI
-$this->ngay_khoi_hanh = $this->ngay_khoi_hanh !== null 
-                                ? htmlspecialchars(strip_tags($this->ngay_khoi_hanh)) 
-                                : null;        $this->so_ngay = htmlspecialchars(strip_tags($this->so_ngay));
+        $this->loai_tour = htmlspecialchars(strip_tags($this->loai_tour));
+        
+        // Xử lý NULL cho ngay_khoi_hanh (Nếu là NULL, không strip_tags)
+        $ngay_khoi_hanh_clean = $this->ngay_khoi_hanh ? htmlspecialchars(strip_tags($this->ngay_khoi_hanh)) : null;
+
+        $this->so_ngay = htmlspecialchars(strip_tags($this->so_ngay));
         $this->gia_tour = htmlspecialchars(strip_tags($this->gia_tour));
         $this->so_cho = htmlspecialchars(strip_tags($this->so_cho));
         $this->trang_thai = htmlspecialchars(strip_tags($this->trang_thai));
-        $this->lich_trinh = htmlspecialchars(strip_tags($this->lich_trinh));
+        $this->lich_trinh = htmlspecialchars(strip_tags($this->lich_trinh ?? ''));
+
 
         $stmt->bindParam(":ten_tour", $this->ten_tour);
         $stmt->bindParam(":mo_ta", $this->mo_ta);
         $stmt->bindParam(":diem_khoi_hanh", $this->diem_khoi_hanh);
         $stmt->bindParam(":diem_den", $this->diem_den);
-        $stmt->bindParam(":loai_tour", $this->loai_tour); // BIND CHÍNH XÁC
-        $stmt->bindParam(":ngay_khoi_hanh", $this->ngay_khoi_hanh);
+        $stmt->bindParam(":loai_tour", $this->loai_tour);
+        $stmt->bindParam(":ngay_khoi_hanh", $ngay_khoi_hanh_clean); // BIND GIÁ TRỊ ĐÃ XỬ LÝ NULL
         $stmt->bindParam(":so_ngay", $this->so_ngay);
         $stmt->bindParam(":gia_tour", $this->gia_tour);
         $stmt->bindParam(":so_cho", $this->so_cho);
@@ -89,39 +108,43 @@ $this->ngay_khoi_hanh = $this->ngay_khoi_hanh !== null
         return false;
     }
 
-    // 4. Cập nhật tour (CẬP NHẬT: Thêm loai_tour)
+    // 4. Cập nhật tour (ĐÃ CÂN CHỈNH LẠI LOGIC XỬ LÝ NULL VÀ LÀM SẠCH DỮ LIỆU)
     public function update() {
         $query = "UPDATE " . $this->table . " 
-                  SET ten_tour=:ten_tour, mo_ta=:mo_ta,
-                      diem_khoi_hanh=:diem_khoi_hanh, diem_den=:diem_den,
-                      loai_tour=:loai_tour, -- THÊM VÀO TRUY VẤN
-                      ngay_khoi_hanh=:ngay_khoi_hanh, so_ngay=:so_ngay,
-                      gia_tour=:gia_tour, so_cho=:so_cho, trang_thai=:trang_thai,
-                      lich_trinh=:lich_trinh  
-                  WHERE id=:id"; 
+                     SET ten_tour=:ten_tour, mo_ta=:mo_ta,
+                         diem_khoi_hanh=:diem_khoi_hanh, diem_den=:diem_den,
+                         loai_tour=:loai_tour, 
+                         ngay_khoi_hanh=:ngay_khoi_hanh, so_ngay=:so_ngay,
+                         gia_tour=:gia_tour, so_cho=:so_cho, trang_thai=:trang_thai,
+                         lich_trinh=:lich_trinh  
+                     WHERE id=:id"; 
 
         $stmt = $this->conn->prepare($query);
 
-        // Làm sạch và Bind dữ liệu
+        // Làm sạch dữ liệu
         $this->ten_tour = htmlspecialchars(strip_tags($this->ten_tour));
         $this->mo_ta = htmlspecialchars(strip_tags($this->mo_ta));
         $this->diem_khoi_hanh = htmlspecialchars(strip_tags($this->diem_khoi_hanh));
         $this->diem_den = htmlspecialchars(strip_tags($this->diem_den));
-        $this->loai_tour = htmlspecialchars(strip_tags($this->loai_tour)); // BIND THUỘC TÍNH MỚI
-        $this->ngay_khoi_hanh = htmlspecialchars(strip_tags($this->ngay_khoi_hanh));
+        $this->loai_tour = htmlspecialchars(strip_tags($this->loai_tour)); 
+        
+        // Xử lý NULL cho ngay_khoi_hanh (QUAN TRỌNG: tránh lỗi "Incorrect date value: ''")
+        // Nếu giá trị là NULL, không strip_tags, chỉ cần gán NULL
+        $ngay_khoi_hanh_clean = $this->ngay_khoi_hanh ? htmlspecialchars(strip_tags($this->ngay_khoi_hanh)) : null;
+
         $this->so_ngay = htmlspecialchars(strip_tags($this->so_ngay));
         $this->gia_tour = htmlspecialchars(strip_tags($this->gia_tour));
         $this->so_cho = htmlspecialchars(strip_tags($this->so_cho));
         $this->trang_thai = htmlspecialchars(strip_tags($this->trang_thai));
-        $this->lich_trinh = htmlspecialchars(strip_tags($this->lich_trinh));
+        $this->lich_trinh = htmlspecialchars(strip_tags($this->lich_trinh ?? ''));
         $this->id = htmlspecialchars(strip_tags($this->id));
 
         $stmt->bindParam(":ten_tour", $this->ten_tour);
         $stmt->bindParam(":mo_ta", $this->mo_ta);
         $stmt->bindParam(":diem_khoi_hanh", $this->diem_khoi_hanh);
         $stmt->bindParam(":diem_den", $this->diem_den);
-        $stmt->bindParam(":loai_tour", $this->loai_tour); // BIND CHÍNH XÁC
-        $stmt->bindParam(":ngay_khoi_hanh", $this->ngay_khoi_hanh);
+        $stmt->bindParam(":loai_tour", $this->loai_tour);
+        $stmt->bindParam(":ngay_khoi_hanh", $ngay_khoi_hanh_clean); // BIND GIÁ TRỊ ĐÃ XỬ LÝ NULL
         $stmt->bindParam(":so_ngay", $this->so_ngay);
         $stmt->bindParam(":gia_tour", $this->gia_tour);
         $stmt->bindParam(":so_cho", $this->so_cho);
@@ -156,32 +179,34 @@ $this->ngay_khoi_hanh = $this->ngay_khoi_hanh !== null
                   ORDER BY t.id ASC";
 
         $stmt = $this->conn->prepare($query);
-        // Làm sạch và Bind dữ liệu
         $loai_tour_clean = htmlspecialchars(strip_tags($loai_tour));
         $stmt->bindParam(":loai_tour", $loai_tour_clean);
         $stmt->execute();
         return $stmt;
     }
-    public function updateSeats($tour_id, $so_nguoi)
-{
-    $sql = "UPDATE tours SET so_cho = so_cho - ? WHERE id = ?";
-    $stmt = $this->conn->prepare($sql);
-    return $stmt->execute([$so_nguoi, $tour_id]);
-}
-    public function find($id)
-{
-    $sql = "SELECT * FROM tours WHERE id = ?";
-    $stmt = $this->conn->prepare($sql);
-    $stmt->execute([$id]);
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
-public function getSchedule($tour_id)
-{
-    $sql = "SELECT * FROM tour_schedule WHERE tour_id = ? ORDER BY day_number ASC";
-    $stmt = $this->conn->prepare($sql);
-    $stmt->execute([$tour_id]);
-    return $stmt->fetchAll(PDO::FETCH_OBJ);
-}
 
+    // --- PHƯƠNG THỨC BỔ SUNG CHO CHỨC NĂNG ĐIỂM DANH/BÁO CÁO ---
 
+    // 7. Lấy tất cả tour đang Hoạt Động (Cần cho chức năng Điểm danh)
+    public function getAllActive() {
+        $query = "SELECT id, ten_tour, ngay_khoi_hanh, so_ngay 
+                  FROM " . $this->table . " 
+                  WHERE trang_thai = 'Đang hoạt động' 
+                  ORDER BY ngay_khoi_hanh ASC";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
+    // models/Tour.php (BỔ SUNG PHƯƠNG THỨC NÀY)
+
+public function getPriceById($tour_id) {
+    $query = "SELECT gia_tour FROM " . $this->table . " WHERE id = ? LIMIT 0,1";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(1, $tour_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ? (float)$row['gia_tour'] : 0.00;
 }
+}
+?>

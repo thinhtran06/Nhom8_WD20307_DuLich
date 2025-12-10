@@ -1,6 +1,6 @@
 <?php include "views/layout/header.php"; ?>
-
-<h3 class="mb-4">➕ Thêm Hướng Dẫn Viên</h3>
+<div style="margin-left:260px; margin-top:80px; padding:20px;">>
+    <h3 class="mb-4">➕ Thêm Hướng Dẫn Viên</h3>
 
 <div class="card shadow-sm p-4">
     <form method="POST" action="index.php?action=guide_store">
@@ -114,3 +114,5 @@
 </div>
 
 <?php include "views/layout/footer.php"; ?>
+
+</div>

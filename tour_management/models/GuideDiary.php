@@ -2,25 +2,22 @@
 class GuideDiary {
 
     private $conn;
-    private $table = "guide_diary";
+    private $table = "tour_diary";
 
     public function __construct($db){
         $this->conn = $db;
     }
 
-    /* Lấy tất cả nhật ký theo tour */
-    public function getAllByTour($tour_id, $guide_id){
+    public function getByTour($tour_id){
         $sql = "SELECT * FROM {$this->table} 
-                WHERE tour_id = ? AND guide_id = ?
+                WHERE tour_id = ?
                 ORDER BY ngay ASC";
-
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute([$tour_id, $guide_id]);
+        $stmt->execute([$tour_id]);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /* Lấy 1 nhật ký */
     public function getById($id){
         $sql = "SELECT * FROM {$this->table} WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
@@ -29,40 +26,40 @@ class GuideDiary {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    /* Thêm nhật ký */
     public function create($data){
         $sql = "INSERT INTO {$this->table}
-                (tour_id, guide_id, ngay, su_kien, su_co, xu_ly, phan_hoi, hinh_anh)
-                VALUES (?,?,?,?,?,?,?,?)";
+                (tour_id, guide_id, ngay, tieu_de, noi_dung, hinh_anh, phan_hoi_khach, su_co, cach_xu_ly)
+                VALUES (?,?,?,?,?,?,?,?,?)";
 
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute([
             $data['tour_id'],
             $data['guide_id'],
             $data['ngay'],
-            $data['su_kien'],
+            $data['tieu_de'],
+            $data['noi_dung'],
+            $data['hinh_anh'],
+            $data['phan_hoi_khach'],
             $data['su_co'],
-            $data['xu_ly'],
-            $data['phan_hoi'],
-            $data['hinh_anh'] ?? null
+            $data['cach_xu_ly']
         ]);
     }
 
-    /* Cập nhật nhật ký */
-    public function update($data){
+    public function update($id, $data){
         $sql = "UPDATE {$this->table}
-                SET ngay=?, su_kien=?, su_co=?, xu_ly=?, phan_hoi=?, hinh_anh=?
+                SET ngay=?, tieu_de=?, noi_dung=?, hinh_anh=?, phan_hoi_khach=?, su_co=?, cach_xu_ly=?
                 WHERE id=?";
 
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute([
             $data['ngay'],
-            $data['su_kien'],
+            $data['tieu_de'],
+            $data['noi_dung'],
+            $data['hinh_anh'],
+            $data['phan_hoi_khach'],
             $data['su_co'],
-            $data['xu_ly'],
-            $data['phan_hoi'],
-            $data['hinh_anh'] ?? null,
-            $data['id']
+            $data['cach_xu_ly'],
+            $id
         ]);
     }
 }
