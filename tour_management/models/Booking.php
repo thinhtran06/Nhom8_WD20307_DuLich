@@ -155,6 +155,21 @@ class Booking
     $stmt = $this->conn->prepare($sql);
     return $stmt->execute([$tour_id, $customer_id]);
 }
+public function getAllBookingsWithDetails() {
+    $sql = "SELECT 
+                b.*, 
+                t.ten_tour, 
+                c.ho_ten
+            FROM bookings b
+            LEFT JOIN tours t ON b.tour_id = t.id
+            LEFT JOIN customers c ON b.customer_id = c.id
+            ORDER BY b.created_at DESC";
+
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+
+    return $stmt;  // TRẢ VỀ PDOStatement, KHÔNG FETCHALL
+}
 
 
 }
