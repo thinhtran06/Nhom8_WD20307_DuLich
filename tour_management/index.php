@@ -180,7 +180,7 @@ if (isset($routes[$action])) {
         // Xử lý logic lọc Tour: Xác định loại tour cần truyền vào Controller
         $loai_tour = ($action === 'tour_trong_nuoc') ? 'Trong nước' : 'Ngoài nước';
         $controller->$method($loai_tour);
-    } elseif (in_array($method, ['updateStatus', 'checkAttendance', 'edit', 'delete', 'show'])) {
+    } elseif (in_array($method, ['updateStatus', 'checkAttendance', 'edit', 'delete', 'show', 'destroy'])) {
         // Gọi các phương thức cần truyền ID
         $controller->$method($id);
     } else {
