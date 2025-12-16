@@ -70,6 +70,10 @@ $displayTitle = $page_title ?? 'Quản Lý Tất Cả Tour Du Lịch';
                         <a href="index.php?action=tour_delete&id=<?php echo $tour['id']; ?>" 
                            onclick="return confirm('Bạn có chắc muốn xóa Tour ID <?php echo $tour['id']; ?>?')" 
                            class="btn btn-sm btn-danger">Xóa</a>
+                           <a href="index.php?action=guide_work_assign&tour_id=<?php echo $tour['id']; ?>" 
+   class="btn btn-sm btn-success">
+   Phân công HDV
+</a>
                     </td>
                 </tr>
                 <?php endforeach; ?>

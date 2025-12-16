@@ -28,7 +28,21 @@
                 </div>
             </div>
         </div>
-        
+        <div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Ngày khởi hành:</label>
+            <input type="date" name="ngay_khoi_hanh" class="form-control" required>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Ngày kết thúc:</label>
+            <input type="date" name="ngay_ket_thuc" class="form-control" required>
+        </div>
+    </div>
+</div>
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">

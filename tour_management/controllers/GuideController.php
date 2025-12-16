@@ -106,19 +106,18 @@ class GuideController {
       LỊCH LÀM VIỆC HDV
     ============================ */
     public function schedule() {
+    if (!isset($_GET['id'])) die("Thiếu ID hướng dẫn viên");
 
-        if (!isset($_GET['id'])) die("Thiếu ID hướng dẫn viên");
+    $guide_id = intval($_GET['id']);
 
-        $guide_id = intval($_GET['id']);
+    require_once "models/Guide.php";
+    require_once "models/GuideWork.php"; // ✅ dùng đúng model
 
-        require_once "models/Guide.php";
-        require_once "models/GuideSchedule.php";
+    $guide = (new Guide($this->conn))->getById($guide_id);
+    $schedule = (new GuideWork($this->conn))->getToursByGuide($guide_id); // ✅ gọi đúng hàm
 
-        $guide = (new Guide($this->conn))->getById($guide_id);
-        $schedule = (new GuideSchedule($this->conn))->getScheduleByGuide($guide_id);
-
-        include "views/guides/schedule.php";
-    }
+    include "views/guides/schedule.php";
+}
 
     /* ============================
       CHI TIẾT TOUR

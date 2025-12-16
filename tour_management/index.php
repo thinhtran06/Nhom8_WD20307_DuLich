@@ -145,7 +145,7 @@ $routes = [
 
     'guide_work_assign'       => ['GuideWork', 'assignForm', true],
     'guide_work_assign_save'  => ['GuideWork', 'assignSave', true],
-    
+
     // Loại bỏ các route cũ không cần thiết, vì đã dùng 'booking_attendance'
     // 'attendance_list_bookings' => ['Attendance', 'listBookings', true], 
     // 'attendance_check'         => ['Attendance', 'checkAttendance', true],

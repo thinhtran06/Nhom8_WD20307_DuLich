@@ -58,8 +58,8 @@ $guide_id = (int)$guide->id;
 
                 <tr>
                     <td><?= htmlspecialchars($s->ten_tour ?? '') ?></td>
-                    <td><?= htmlspecialchars($start) ?></td>
-                    <td><?= htmlspecialchars($end) ?></td>
+                    <td><?= htmlspecialchars($start ?? '') ?></td>
+                    <td><?= htmlspecialchars($end ?? '') ?></td>
                     <td><?= htmlspecialchars($s->diem_khoi_hanh ?? '') ?></td>
                     <td><?= htmlspecialchars($s->diem_den ?? '') ?></td>
 

@@ -13,6 +13,7 @@ class Tour {
     public $diem_den;
     public $loai_tour;
     public $ngay_khoi_hanh;
+    public $ngay_ket_thuc;
     public $so_ngay;
     public $gia_tour;
     public $so_cho;
@@ -68,6 +69,7 @@ class Tour {
                          diem_khoi_hanh=:diem_khoi_hanh, diem_den=:diem_den,
                          loai_tour=:loai_tour, 
                          ngay_khoi_hanh=:ngay_khoi_hanh, so_ngay=:so_ngay,
+                         ngay_ket_thuc=:ngay_ket_thuc,
                          gia_tour=:gia_tour, so_cho=:so_cho, trang_thai=:trang_thai, 
                          lich_trinh=:lich_trinh"; 
 
@@ -82,7 +84,7 @@ class Tour {
         
         // Xử lý NULL cho ngay_khoi_hanh (Nếu là NULL, không strip_tags)
         $ngay_khoi_hanh_clean = $this->ngay_khoi_hanh ? htmlspecialchars(strip_tags($this->ngay_khoi_hanh)) : null;
-
+        $ngay_ket_thuc_clean = $this->ngay_ket_thuc ? htmlspecialchars(strip_tags($this->ngay_ket_thuc)) : null;
         $this->so_ngay = htmlspecialchars(strip_tags($this->so_ngay));
         $this->gia_tour = htmlspecialchars(strip_tags($this->gia_tour));
         $this->so_cho = htmlspecialchars(strip_tags($this->so_cho));
@@ -95,7 +97,8 @@ class Tour {
         $stmt->bindParam(":diem_khoi_hanh", $this->diem_khoi_hanh);
         $stmt->bindParam(":diem_den", $this->diem_den);
         $stmt->bindParam(":loai_tour", $this->loai_tour);
-        $stmt->bindParam(":ngay_khoi_hanh", $ngay_khoi_hanh_clean); // BIND GIÁ TRỊ ĐÃ XỬ LÝ NULL
+        $stmt->bindParam(":ngay_khoi_hanh", $ngay_khoi_hanh_clean);
+        $stmt->bindParam(":ngay_ket_thuc", $ngay_ket_thuc_clean); // BIND GIÁ TRỊ ĐÃ XỬ LÝ NULL
         $stmt->bindParam(":so_ngay", $this->so_ngay);
         $stmt->bindParam(":gia_tour", $this->gia_tour);
         $stmt->bindParam(":so_cho", $this->so_cho);
@@ -115,6 +118,7 @@ class Tour {
                          diem_khoi_hanh=:diem_khoi_hanh, diem_den=:diem_den,
                          loai_tour=:loai_tour, 
                          ngay_khoi_hanh=:ngay_khoi_hanh, so_ngay=:so_ngay,
+                         ngay_ket_thuc=:ngay_ket_thuc,
                          gia_tour=:gia_tour, so_cho=:so_cho, trang_thai=:trang_thai,
                          lich_trinh=:lich_trinh  
                      WHERE id=:id"; 
@@ -131,7 +135,7 @@ class Tour {
         // Xử lý NULL cho ngay_khoi_hanh (QUAN TRỌNG: tránh lỗi "Incorrect date value: ''")
         // Nếu giá trị là NULL, không strip_tags, chỉ cần gán NULL
         $ngay_khoi_hanh_clean = $this->ngay_khoi_hanh ? htmlspecialchars(strip_tags($this->ngay_khoi_hanh)) : null;
-
+        $ngay_ket_thuc_clean = $this->ngay_ket_thuc ? htmlspecialchars(strip_tags($this->ngay_ket_thuc)) : null;
         $this->so_ngay = htmlspecialchars(strip_tags($this->so_ngay));
         $this->gia_tour = htmlspecialchars(strip_tags($this->gia_tour));
         $this->so_cho = htmlspecialchars(strip_tags($this->so_cho));
@@ -144,7 +148,8 @@ class Tour {
         $stmt->bindParam(":diem_khoi_hanh", $this->diem_khoi_hanh);
         $stmt->bindParam(":diem_den", $this->diem_den);
         $stmt->bindParam(":loai_tour", $this->loai_tour);
-        $stmt->bindParam(":ngay_khoi_hanh", $ngay_khoi_hanh_clean); // BIND GIÁ TRỊ ĐÃ XỬ LÝ NULL
+        $stmt->bindParam(":ngay_khoi_hanh", $ngay_khoi_hanh_clean);
+        $stmt->bindParam(":ngay_ket_thuc", $ngay_ket_thuc_clean); // BIND GIÁ TRỊ ĐÃ XỬ LÝ NULL
         $stmt->bindParam(":so_ngay", $this->so_ngay);
         $stmt->bindParam(":gia_tour", $this->gia_tour);
         $stmt->bindParam(":so_cho", $this->so_cho);

@@ -357,15 +357,7 @@ $isCategoryActive = in_array($currentAction, $categoryActions);
     .sidebar::-webkit-scrollbar-thumb:hover {
         background: #555;
     }
-    .diary-wrapper {
-    margin-top: 40px;
-    padding: 25px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.diary-title {
+    .diary-title {
     margin-bottom: 20px;
     font-weight: 600;
 }
