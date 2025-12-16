@@ -110,37 +110,21 @@
 
 <h3 class="mt-4 mb-3 text-primary">🗺️ Lịch trình tour</h3>
 
-<?php if (empty($schedule)): ?>
+<?php if (!empty($tour->lich_trinh)): ?>
+
+    <ul class="list-group">
+        <?php foreach (explode("\n", $tour->lich_trinh) as $ngay): ?>
+            <li class="list-group-item">
+                <?= htmlspecialchars(trim($ngay)) ?>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+
+<?php else: ?>
 
     <div class="alert alert-warning">
         Chưa có lịch trình cho tour này.
     </div>
-
-<?php else: ?>
-
-<table class="table table-bordered">
-    <thead class="table-light">
-        <tr>
-            <th>Ngày</th>
-            <th>Nội dung</th>
-            <th>Thời gian</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        <?php foreach ($schedule as $day): ?>
-            <tr>
-                <td>Ngày <?= $day->day_number ?></td>
-                <td><?= nl2br(htmlspecialchars($day->noi_dung)) ?></td>
-                <td>
-                    <?= htmlspecialchars($day->thoi_gian_bat_dau) ?>
-                    →
-                    <?= htmlspecialchars($day->thoi_gian_ket_thuc) ?>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
 
 <?php endif; ?>
 

@@ -36,31 +36,12 @@ class Tour {
     }
 
     // 2. Lấy tour theo ID
-    public function getById() {
-        $query = "SELECT * FROM " . $this->table . " WHERE id = ? LIMIT 0,1";
-
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->id);
-        $stmt->execute();
-
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($row) {
-            $this->ten_tour = $row['ten_tour'];
-            $this->mo_ta = $row['mo_ta'];
-            $this->diem_khoi_hanh = $row['diem_khoi_hanh'];
-            $this->diem_den = $row['diem_den'];
-            $this->loai_tour = $row['loai_tour']; 
-            $this->ngay_khoi_hanh = $row['ngay_khoi_hanh'];
-            $this->so_ngay = $row['so_ngay'];
-            $this->gia_tour = $row['gia_tour'];
-            $this->so_cho = $row['so_cho'];
-            $this->trang_thai = $row['trang_thai'];
-            $this->lich_trinh = $row['lich_trinh'];
-            return $stmt; // Trả về stmt để Controller có thể fetch dữ liệu
-        }
-        return false;
-    }
+    public function getById($id) {
+    $query = "SELECT * FROM tours WHERE id = ? LIMIT 1";
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute([$id]);
+    return $stmt->fetch(PDO::FETCH_OBJ);
+}
 
     // 3. Tạo tour mới (ĐÃ CÂN CHỈNH LẠI LOGIC XỬ LÝ NULL)
     public function create() {

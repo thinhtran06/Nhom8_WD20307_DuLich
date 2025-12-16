@@ -124,22 +124,32 @@ class GuideController {
     ============================ */
     public function tourDetail() {
 
-        if (!isset($_GET['tour_id']) || !isset($_GET['guide_id']))
-            die("Thiếu tour_id hoặc guide_id");
-
-        $tour_id  = intval($_GET['tour_id']);
-        $guide_id = intval($_GET['guide_id']);
-
-        require_once "models/Tour.php";
-        require_once "models/Booking.php";
-        require_once "models/Guide.php";
-
-        $tour = (new Tour($this->conn))->getById($tour_id);
-        $guide = (new Guide($this->conn))->getById($guide_id);
-        $customers = (new Booking($this->conn))->getCustomersByTour($tour_id);
-
-        include "views/guides/tour_detail.php";
+    if (!isset($_GET['tour_id']) || !isset($_GET['guide_id'])) {
+        die("Thiếu tour_id hoặc guide_id");
     }
+
+    $tour_id  = intval($_GET['tour_id']);
+    $guide_id = intval($_GET['guide_id']);
+
+    require_once "models/Tour.php";
+    require_once "models/Booking.php";
+    require_once "models/Guide.php";
+
+    // ✅ Lấy thông tin tour (đúng chuẩn)
+    $tourModel = new Tour($this->conn);
+    $tour = $tourModel->getById($tour_id);
+
+    // ✅ Lấy thông tin HDV (đúng chuẩn)
+    $guideModel = new Guide($this->conn);
+    $guide = $guideModel->getById($guide_id);
+
+    // ✅ Lấy danh sách khách
+    $bookingModel = new Booking($this->conn);
+    $customers = $bookingModel->getCustomersByTour($tour_id);
+
+
+    include "views/guides/tour_detail.php";
+}
 
     /* ============================
       DANH SÁCH KHÁCH

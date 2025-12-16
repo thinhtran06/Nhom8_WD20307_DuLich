@@ -53,13 +53,18 @@ class TourController {
 
     // Hiển thị chi tiết tour
     public function show($id) {
-        $this->tour->id = $id;
-        if($this->tour->getById()) {
-            require_once 'views/tours/detail.php';
-        } else {
-            echo "Tour không tồn tại!";
-        }
+
+    require_once "models/Tour.php";
+
+    $tourModel = new Tour($this->db);
+    $tour = $tourModel->getById($id);
+
+    if (!$tour) {
+        die("Không tìm thấy tour");
     }
+
+    include "views/tours/detail.php";
+}
 
     // Hiển thị form chỉnh sửa
     public function edit($id) {

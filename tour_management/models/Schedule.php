@@ -7,11 +7,11 @@ class Schedule {
         $this->conn = $db;
     }
 
-    public function getByTour($tour_id) {
+    public function getByTourId($tour_id) {
         $sql = "SELECT * FROM schedule WHERE tour_id = ? ORDER BY ngay_thu ASC";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$tour_id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 }
 ?>
