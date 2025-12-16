@@ -22,7 +22,7 @@
 
             <?php else: ?>
 
-                <form method="POST" action="index.php?action=guide_special_request_save">
+                <form method="POST"action="index.php?action=guide_save_special_request">
 
                     <input type="hidden" name="tour_id" value="<?= (int)$tour_id ?>">
                     <input type="hidden" name="guide_id" value="<?= (int)$guide_id ?>">
@@ -98,7 +98,11 @@
             <?php endif; ?>
 
         </div>
-
+                <?php if (isset($_GET['saved']) && $_GET['saved'] == 1): ?>
+    <div class="alert alert-success">
+        ✅ Lưu yêu cầu thành công!
+    </div>
+<?php endif; ?>
     </div>
 
 </div>
