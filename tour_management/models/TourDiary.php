@@ -95,4 +95,18 @@ class TourDiary {
     $stmt = $this->conn->prepare($sql);
     return $stmt->execute([$id]);
 }
+public function getByTourAndGuide($tour_id, $guide_id)
+{
+    $sql = "SELECT *
+            FROM {$this->table}
+            WHERE tour_id = ?
+              AND guide_id = ?
+            ORDER BY ngay DESC";
+
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute([$tour_id, $guide_id]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 }

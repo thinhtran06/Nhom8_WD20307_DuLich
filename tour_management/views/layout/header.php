@@ -357,6 +357,40 @@ $isCategoryActive = in_array($currentAction, $categoryActions);
     .sidebar::-webkit-scrollbar-thumb:hover {
         background: #555;
     }
+    .diary-wrapper {
+    margin-top: 40px;
+    padding: 25px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.diary-title {
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.diary-table th {
+    background: #f8f9fa;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.diary-table td {
+    vertical-align: top;
+    font-size: 14px;
+}
+
+.diary-actions a {
+    display: inline-block;
+    width: 60px;
+}
+
+.diary-empty {
+    margin-top: 20px;
+    font-style: italic;
+}
+
 </style>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

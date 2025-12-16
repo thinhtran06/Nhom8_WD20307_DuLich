@@ -1,51 +1,102 @@
+<?php
+// ==================
+// Guard variables
+// ==================
+$diaries  = $diaries  ?? [];
+$tour_id  = $tour_id  ?? ($_GET['tour_id']  ?? 0);
+$guide_id = $guide_id ?? ($_GET['guide_id'] ?? 0);
+?>
+
 <?php include "views/layout/header.php"; ?>
 
-<div class="container mt-4">
+<div class="container">
 
-<h3>📘 Nhật ký tour</h3>
+    <div class="diary-wrapper">
 
-<?php if (empty($entries)): ?>
-    <div class="alert alert-info mt-3">Chưa có nhật ký nào.</div>
-<?php else: ?>
+        <h3 class="diary-title">📘 Nhật ký tour</h3>
 
-<table class="table table-bordered table-striped mt-3">
-    <thead class="table-light">
-        <tr>
-            <th>Ngày ghi</th>
-            <th>Nội dung</th>
-            <th>Ghi chú</th>
-            <th>Thao tác</th>
-        </tr>
-    </thead>
+        <?php if (empty($diaries)): ?>
+            <div class="alert alert-info diary-empty">
+                Chưa có nhật ký nào cho tour này.
+            </div>
+        <?php else: ?>
 
-    <tbody>
-        <?php foreach ($entries as $e): ?>
-            <tr>
-                <td><?= htmlspecialchars($e['created_at'] ?? '') ?></td>
-                <td><?= nl2br(htmlspecialchars($e['noi_dung'] ?? '')) ?></td>
-                <td><?= nl2br(htmlspecialchars($e['ghi_chu'] ?? '')) ?></td>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped diary-table">
+                    <thead>
+                        <tr>
+                            <th width="120">Ngày</th>
+                            <th width="180">Tiêu đề</th>
+                            <th>Nội dung</th>
+                            <th>Sự cố</th>
+                            <th>Phản hồi khách</th>
+                            <th>Cách xử lý</th>
+                            <th width="140">Thao tác</th>
+                        </tr>
+                    </thead>
 
-                <td>
-                    <a class="btn btn-warning btn-sm"
-                       href="index.php?action=guide_diary_edit&id=<?= $e['id'] ?>">
-                        Sửa
-                    </a>
+                    <tbody>
+                        <?php foreach ($diaries as $e): ?>
+                            <tr>
+                                <td class="text-center">
+                                    <?= htmlspecialchars($e['ngay'] ?? '') ?>
+                                </td>
 
-                    <a class="btn btn-danger btn-sm"
-                       onclick="return confirm('Xóa nhật ký này?')"
-                       href="index.php?action=guide_diary_delete&id=<?= $e['id'] ?>">
-                        Xóa
-                    </a>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+                                <td>
+                                    <strong>
+                                        <?= htmlspecialchars($e['tieu_de'] ?? '') ?>
+                                    </strong>
+                                </td>
 
-<?php endif; ?>
+                                <td>
+                                    <?= nl2br(htmlspecialchars($e['noi_dung'] ?? '')) ?>
+                                </td>
 
-<a href="javascript:history.back();" class="btn btn-secondary mt-3">⬅ Quay lại</a>
+                                <td>
+                                    <?= nl2br(htmlspecialchars($e['su_co'] ?? '—')) ?>
+                                </td>
 
+                                <td>
+                                    <?= nl2br(htmlspecialchars($e['phan_hoi_khach'] ?? '—')) ?>
+                                </td>
+
+                                <td>
+                                    <?= nl2br(htmlspecialchars($e['cach_xu_ly'] ?? '—')) ?>
+                                </td>
+
+                                <td class="text-center diary-actions">
+                                    <a class="btn btn-warning btn-sm mb-1"
+                                       href="index.php?action=guide_diary_edit&id=<?= (int)$e['id'] ?>">
+                                        Sửa
+                                    </a>
+
+                                    <a class="btn btn-danger btn-sm"
+                                       onclick="return confirm('Xóa nhật ký này?')"
+                                       href="index.php?action=guide_diary_delete&id=<?= (int)$e['id'] ?>&tour_id=<?= (int)$tour_id ?>&guide_id=<?= (int)$guide_id ?>">
+                                        Xóa
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+        <?php endif; ?>
+
+        <div class="mt-3">
+            <a href="index.php?action=guide_diary_add&tour_id=<?= (int)$tour_id ?>&guide_id=<?= (int)$guide_id ?>"
+               class="btn btn-primary">
+                ➕ Thêm nhật ký
+            </a>
+
+            <a href="index.php?action=guide_schedule&id=<?= (int)$guide_id ?>"
+               class="btn btn-secondary ms-2">
+                ⬅ Quay lại
+            </a>
+        </div>
+
+    </div>
 </div>
 
 <?php include "views/layout/footer.php"; ?>
