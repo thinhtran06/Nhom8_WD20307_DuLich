@@ -1,16 +1,19 @@
 <?php include "views/layout/header.php"; ?>
 
+
 <?php 
 if (!$guide) {
     echo "<div class='alert alert-danger mt-4'>Không tìm thấy hướng dẫn viên.</div>";
     echo "<a href='index.php?action=guide_index' class='btn btn-primary'>Quay lại</a>";
     include "views/layout/footer.php";
     exit;
+    
 }
 
 $guide_id = (int)$guide->id;
 ?>
-<div style="margin-left:260px; margin-top:30px; padding:20px;">
+
+<div class="main-content">
 <h3 class="mt-3">
     Lịch làm việc của Hướng Dẫn Viên: 
     <span class="text-primary fw-bold"><?= htmlspecialchars($guide->ho_ten ?? '') ?></span>
@@ -66,51 +69,20 @@ $guide_id = (int)$guide->id;
                     <td class="text-center">
 
                         <!-- Dropdown thao tác -->
-                        <div class="btn-group">
-    <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown">
-        Thao tác
-    </button>
+      <div class="dropdown">
+  <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="dropdownMenu<?= $tour_id ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Thao tác
+  </button>
 
-    <ul class="dropdown-menu dropdown-menu-end">
-
-        <li>
-            <a class="dropdown-item"
-                href="index.php?action=guide_tour_detail&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">
-                Chi tiết tour
-            </a>
-        </li>
-
-        <li>
-            <a class="dropdown-item"
-                href="index.php?action=guide_special_request&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">
-                Yêu cầu đặc biệt
-            </a>
-        </li>
-
-        <li>
-            <a class="dropdown-item"
-                href="index.php?action=guide_diary&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">
-                Nhật ký tour
-            </a>
-        </li>
-
-        <li>
-            <a class="dropdown-item"
-                href="index.php?action=guide_checkin&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">
-                Điểm danh
-            </a>
-        </li>
-
-        <li>
-            <a class="dropdown-item"
-                href="index.php?action=guide_customers&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">
-                Danh sách khách
-            </a>
-        </li>
-
-    </ul>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenu<?= $tour_id ?>">
+    <a class="dropdown-item" href="index.php?action=guide_tour_detail&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">Chi tiết tour</a>
+    <a class="dropdown-item" href="index.php?action=guide_special_request&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">Yêu cầu đặc biệt</a>
+    <a class="dropdown-item" href="index.php?action=guide_diary&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">Nhật ký tour</a>
+    <a class="dropdown-item" href="index.php?action=guide_checkin&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">Điểm danh</a>
+    <a class="dropdown-item" href="index.php?action=guide_customers&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">Danh sách khách</a>
+  </div>
 </div>
-
+</div>
                     </td>
                 </tr>
 

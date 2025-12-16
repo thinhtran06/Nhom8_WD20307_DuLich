@@ -45,47 +45,52 @@ class Guide {
        TẠO HDV MỚI
     ============================ */
     public function create($data) {
-        $query = "INSERT INTO " . $this->table . " 
-                  (ho_ten, loai_hdv, chuyen_tuyen, ngon_ngu, so_dien_thoai, email, dia_chi, trang_thai)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    $query = "INSERT INTO " . $this->table . " 
+              (ho_ten, ngay_sinh, gioi_tinh, dien_thoai, email, trang_thai, dia_chi, ngon_ngu, loai_hdv, chuyen_tuyen, ghi_chu)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        $stmt = $this->conn->prepare($query);
+    $stmt = $this->conn->prepare($query);
 
-        return $stmt->execute([
-            $data['ho_ten'],
-            $data['loai_hdv'],
-            $data['chuyen_tuyen'],
-            $data['ngon_ngu'],
-            $data['so_dien_thoai'],
-            $data['email'],
-            $data['dia_chi'],
-            $data['trang_thai']
-        ]);
-    }
+    return $stmt->execute([
+        $data['ho_ten'],
+        $data['ngay_sinh'],
+        $data['gioi_tinh'],
+        $data['dien_thoai'],
+        $data['email'],
+        $data['trang_thai'],
+        $data['dia_chi'],
+        $data['ngon_ngu'],
+        $data['loai_hdv'],
+        $data['chuyen_tuyen'],
+        $data['ghi_chu']
+    ]);
+}
 
     /* ============================
        CẬP NHẬT HDV
     ============================ */
     public function update($data) {
-        $query = "UPDATE " . $this->table . "
-                  SET ho_ten=?, loai_hdv=?, chuyen_tuyen=?, ngon_ngu=?, 
-                      so_dien_thoai=?, email=?, dia_chi=?, trang_thai=?
-                  WHERE id=?";
+    $query = "UPDATE " . $this->table . "
+              SET ho_ten=?, ngay_sinh=?, gioi_tinh=?, dien_thoai=?, email=?, trang_thai=?, dia_chi=?, ngon_ngu=?, loai_hdv=?, chuyen_tuyen=?, ghi_chu=?
+              WHERE id=?";
 
-        $stmt = $this->conn->prepare($query);
+    $stmt = $this->conn->prepare($query);
 
-        return $stmt->execute([
-            $data['ho_ten'],
-            $data['loai_hdv'],
-            $data['chuyen_tuyen'],
-            $data['ngon_ngu'],
-            $data['so_dien_thoai'],
-            $data['email'],
-            $data['dia_chi'],
-            $data['trang_thai'],
-            $data['id']
-        ]);
-    }
+    return $stmt->execute([
+        $data['ho_ten'],
+        $data['ngay_sinh'],
+        $data['gioi_tinh'],
+        $data['dien_thoai'],
+        $data['email'],
+        $data['trang_thai'],
+        $data['dia_chi'],
+        $data['ngon_ngu'],
+        $data['loai_hdv'],
+        $data['chuyen_tuyen'],
+        $data['ghi_chu'],
+        $data['id']
+    ]);
+}
 
     /* ============================
        XÓA HDV
@@ -95,6 +100,18 @@ class Guide {
         $stmt = $this->conn->prepare($query);
         return $stmt->execute([$id]);
     }
+    /* ============================
+   STORE = CREATE + UPDATE
+============================ */
+public function store($data) {
+    // Nếu có ID → cập nhật
+    if (!empty($data['id'])) {
+        return $this->update($data);
+    }
+
+    // Nếu không có ID → thêm mới
+    return $this->create($data);
+}
 }
 
 ?>
