@@ -109,5 +109,5 @@ if (empty($guide)) {
     <a href="index.php?action=guide_index" class="btn btn-secondary">Hủy</a>
 
 </form>
-<</div>
+</div>
 <?php include "views/layout/footer.php"; ?>
