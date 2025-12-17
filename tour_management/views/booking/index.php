@@ -40,7 +40,7 @@ include 'views/layout/header.php';
                 <tbody>
                     <?php 
                     // Định nghĩa các trạng thái có thể có
-                    $statuses = ['Chờ xác nhận', 'Đã xác nhận', 'Đã hủy', 'Đã hoàn thành'];
+                    $statuses = ['Chờ xác nhận', 'Đã xác nhận', 'Đã hủy', 'Hoàn thành'];
                     
                     while ($booking = $bookings->fetch(PDO::FETCH_ASSOC)): 
                         // Tính toán và định dạng số tiền
@@ -91,6 +91,12 @@ include 'views/layout/header.php';
                                     class="btn btn-danger mb-1" title="Xóa Booking">
                                     <i class="fas fa-trash"></i> Xóa
                                 </a>
+                                <a href="index.php?action=booking_show&id=<?php echo $booking['id']; ?>" 
+       class="btn btn-primary px-3" 
+       style="font-weight: 500;">
+        <i class="fas fa-eye me-1"></i> Xem
+    </a>
+                                
                             </td>
                         </tr>
                     <?php endwhile; ?>

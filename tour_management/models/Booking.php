@@ -6,13 +6,14 @@ class Booking {
     private $table = "bookings"; 
 
     // Thuộc tính đối tượng (theo cột trong CSDL)
+    // Lưu ý: ngay_dat được dùng để lưu Ngày Khởi Hành theo cấu trúc DB phổ biến.
     public $id;
     public $tour_id;
     public $customer_id;
     public $loai_khach; 
     public $user_id;
     public $ma_dat_tour;
-    public $ngay_dat;
+    public $ngay_dat; // Ngày khởi hành của Tour
     public $so_nguoi_lon;
     public $so_tre_em;
     public $trang_thai; 
@@ -29,16 +30,17 @@ class Booking {
 
     /**
      * Lấy tất cả Booking kèm chi tiết Tour và Khách hàng đại diện.
+     * @return PDOStatement
      */
     public function getAllBookingsWithDetails() {
         $query = "SELECT 
                       b.*, 
                       t.ten_tour, 
                       c.ho_ten
-                  FROM " . $this->table . " b
-                  JOIN tours t ON b.tour_id = t.id
-                  JOIN customers c ON b.customer_id = c.id
-                  ORDER BY b.ngay_dat DESC";
+                    FROM " . $this->table . " b
+                    JOIN tours t ON b.tour_id = t.id
+                    JOIN customers c ON b.customer_id = c.id
+                    ORDER BY b.ngay_dat DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
@@ -46,10 +48,13 @@ class Booking {
 
     /**
      * Lấy thông tin Booking theo ID và gán vào thuộc tính.
+     * @return bool
      */
     public function getById() {
         $query = "SELECT * FROM " . $this->table . " WHERE id = ? LIMIT 0,1";
         $stmt = $this->conn->prepare($query);
+        
+        // Làm sạch và bind ID
         $this->id = htmlspecialchars(strip_tags($this->id));
         $stmt->bindParam(1, $this->id, PDO::PARAM_INT);
         
@@ -77,17 +82,34 @@ class Booking {
 
     /**
      * Tạo Booking mới.
+     * @return int|bool ID Booking mới hoặc False nếu thất bại.
      */
     public function create() {
         $query = "INSERT INTO " . $this->table . " 
-                  SET tour_id=:tour_id, customer_id=:customer_id, user_id=:user_id,
-                      ma_dat_tour=:ma_dat_tour, ngay_dat=:ngay_dat, loai_khach=:loai_khach,
-                      so_nguoi_lon=:so_nguoi_lon, so_tre_em=:so_tre_em, trang_thai=:trang_thai, 
-                      tong_tien=:tong_tien, da_thanh_toan=:da_thanh_toan, con_lai=:con_lai, ghi_chu=:ghi_chu";
+                     SET tour_id=:tour_id, customer_id=:customer_id, user_id=:user_id,
+                         ma_dat_tour=:ma_dat_tour, ngay_dat=:ngay_dat, loai_khach=:loai_khach,
+                         so_nguoi_lon=:so_nguoi_lon, so_tre_em=:so_tre_em, trang_thai=:trang_thai, 
+                         tong_tien=:tong_tien, da_thanh_toan=:da_thanh_toan, con_lai=:con_lai, 
+                         ghi_chu=:ghi_chu, created_at=NOW(), updated_at=NOW()";
         
         $stmt = $this->conn->prepare($query);
 
-        // Bind dữ liệu
+        // Làm sạch dữ liệu và Bind
+        $this->tour_id = htmlspecialchars(strip_tags($this->tour_id));
+        $this->customer_id = htmlspecialchars(strip_tags($this->customer_id));
+        $this->user_id = htmlspecialchars(strip_tags($this->user_id));
+        $this->ma_dat_tour = htmlspecialchars(strip_tags($this->ma_dat_tour));
+        $this->ngay_dat = htmlspecialchars(strip_tags($this->ngay_dat));
+        $this->loai_khach = htmlspecialchars(strip_tags($this->loai_khach));
+        $this->so_nguoi_lon = htmlspecialchars(strip_tags($this->so_nguoi_lon));
+        $this->so_tre_em = htmlspecialchars(strip_tags($this->so_tre_em));
+        $this->trang_thai = htmlspecialchars(strip_tags($this->trang_thai));
+        $this->tong_tien = htmlspecialchars(strip_tags($this->tong_tien));
+        $this->da_thanh_toan = htmlspecialchars(strip_tags($this->da_thanh_toan));
+        $this->con_lai = htmlspecialchars(strip_tags($this->con_lai));
+        $this->ghi_chu = htmlspecialchars(strip_tags($this->ghi_chu));
+
+
         $stmt->bindParam(":tour_id", $this->tour_id, PDO::PARAM_INT);
         $stmt->bindParam(":customer_id", $this->customer_id, PDO::PARAM_INT);
         $stmt->bindParam(":user_id", $this->user_id, PDO::PARAM_INT);
@@ -102,23 +124,41 @@ class Booking {
         $stmt->bindParam(":con_lai", $this->con_lai); 
         $stmt->bindParam(":ghi_chu", $this->ghi_chu); 
 
-        return $stmt->execute();
+        if ($stmt->execute()) {
+            return $this->conn->lastInsertId();
+        }
+        return false;
     }
 
     /**
      * Cập nhật Booking.
+     * @return bool
      */
     public function update() {
         $query = "UPDATE " . $this->table . " 
-                  SET tour_id=:tour_id, customer_id=:customer_id, 
-                      ngay_dat=:ngay_dat, so_nguoi_lon=:so_nguoi_lon, 
-                      so_tre_em=:so_tre_em, trang_thai=:trang_thai, loai_khach=:loai_khach,
-                      tong_tien=:tong_tien, da_thanh_toan=:da_thanh_toan, con_lai=:con_lai, ghi_chu=:ghi_chu
-                  WHERE id=:id";
+                     SET tour_id=:tour_id, customer_id=:customer_id, 
+                         ngay_dat=:ngay_dat, so_nguoi_lon=:so_nguoi_lon, 
+                         so_tre_em=:so_tre_em, trang_thai=:trang_thai, loai_khach=:loai_khach,
+                         tong_tien=:tong_tien, da_thanh_toan=:da_thanh_toan, con_lai=:con_lai, 
+                         ghi_chu=:ghi_chu, updated_at=NOW()
+                     WHERE id=:id";
         
         $stmt = $this->conn->prepare($query);
 
-        // Bind dữ liệu
+        // Làm sạch dữ liệu và Bind (Cần làm sạch tất cả các thuộc tính trước khi bind)
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        $this->tour_id = htmlspecialchars(strip_tags($this->tour_id));
+        $this->customer_id = htmlspecialchars(strip_tags($this->customer_id));
+        $this->ngay_dat = htmlspecialchars(strip_tags($this->ngay_dat));
+        $this->loai_khach = htmlspecialchars(strip_tags($this->loai_khach));
+        $this->so_nguoi_lon = htmlspecialchars(strip_tags($this->so_nguoi_lon));
+        $this->so_tre_em = htmlspecialchars(strip_tags($this->so_tre_em));
+        $this->trang_thai = htmlspecialchars(strip_tags($this->trang_thai));
+        $this->tong_tien = htmlspecialchars(strip_tags($this->tong_tien));
+        $this->da_thanh_toan = htmlspecialchars(strip_tags($this->da_thanh_toan));
+        $this->con_lai = htmlspecialchars(strip_tags($this->con_lai));
+        $this->ghi_chu = htmlspecialchars(strip_tags($this->ghi_chu));
+        
         $stmt->bindParam(":id", $this->id, PDO::PARAM_INT);
         $stmt->bindParam(":tour_id", $this->tour_id, PDO::PARAM_INT);
         $stmt->bindParam(":customer_id", $this->customer_id, PDO::PARAM_INT);
@@ -137,6 +177,7 @@ class Booking {
     
     /**
      * Xóa Booking.
+     * @return bool
      */
     public function delete() {
         $query = "DELETE FROM " . $this->table . " WHERE id = ?";
@@ -148,33 +189,33 @@ class Booking {
 
     /**
      * Cập nhật nhanh trạng thái Booking.
+     * @param string $new_status Trạng thái mới.
+     * @return bool
      */
     public function updateStatus($new_status) {
         $query = "UPDATE " . $this->table . "
-                  SET trang_thai = :trang_thai, 
-                      updated_at = NOW()
-                  WHERE id = :id";
+                      SET trang_thai = :trang_thai, 
+                          updated_at = NOW()
+                      WHERE id = :id";
         
         $stmt = $this->conn->prepare($query);
         
         // Làm sạch dữ liệu
-        $new_status = htmlspecialchars(strip_tags($new_status));
+        $new_status_clean = htmlspecialchars(strip_tags($new_status));
         $this->id = htmlspecialchars(strip_tags($this->id));
 
         // Gán giá trị
-        $stmt->bindParam(':trang_thai', $new_status);
+        $stmt->bindParam(':trang_thai', $new_status_clean);
         $stmt->bindParam(':id', $this->id);
         
-        if ($stmt->execute()) {
-            return true;
-        }
-        return false;
+        return $stmt->execute();
     }
 
     // --- PHƯƠNG THỨC HỖ TRỢ ĐIỂM DANH (ATTENDANCE) ---
 
     /**
      * Lấy danh sách các chuyến đi (Tour Runs) đang hoạt động để chọn điểm danh.
+     * @return PDOStatement
      */
     public function getDistinctTourRuns() {
         $query = "SELECT 
@@ -182,12 +223,14 @@ class Booking {
                       b.tour_id,
                       t.ten_tour, 
                       b.ngay_dat AS ngay_khoi_hanh, 
-                      t.so_ngay 
-                  FROM bookings b
-                  JOIN tours t ON b.tour_id = t.id
-                  WHERE b.trang_thai = 'Đã xác nhận'  /* <--- ĐIỀU KIỆN TẠI ĐÂY */
-                  AND DATE_ADD(b.ngay_dat, INTERVAL t.so_ngay DAY) >= CURDATE()
-                  ORDER BY b.ngay_dat DESC";
+                      t.so_ngay,
+                      SUM(b.so_nguoi_lon + b.so_tre_em) AS total_guests
+                    FROM bookings b
+                    JOIN tours t ON b.tour_id = t.id
+                    WHERE b.trang_thai = 'Đã xác nhận'
+                      AND b.ngay_dat >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) /* Lấy các tour trong 7 ngày gần nhất & tương lai */
+                    GROUP BY b.tour_id, b.ngay_dat
+                    ORDER BY b.ngay_dat DESC";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -196,6 +239,8 @@ class Booking {
 
     /**
      * Lấy thông tin Tour Run (Booking) để hiển thị chi tiết.
+     * @param int $booking_id ID của Booking
+     * @return array|bool Dữ liệu Tour hoặc False
      */
     public function getTourInfoByBookingId($booking_id) {
         $query = "SELECT 
@@ -204,10 +249,10 @@ class Booking {
                       t.ten_tour, 
                       t.so_ngay,
                       b.ngay_dat AS ngay_khoi_hanh
-                  FROM bookings b
-                  JOIN tours t ON b.tour_id = t.id
-                  WHERE b.id = :booking_id
-                  LIMIT 1";
+                    FROM bookings b
+                    JOIN tours t ON b.tour_id = t.id
+                    WHERE b.id = :booking_id
+                    LIMIT 1";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":booking_id", $booking_id, PDO::PARAM_INT);
@@ -216,7 +261,11 @@ class Booking {
     }
     
     /**
-     * Lấy danh sách Booking (tên người đại diện) cho Attendance Check.
+     * Lấy danh sách Khách lẻ (tên người đại diện) cho Attendance Check.
+     * Phương thức này nên được sử dụng để lấy TẤT CẢ các Booking thuộc về cùng một chuyến đi (tour_id và ngay_dat).
+     * Tuy nhiên, nếu bạn chỉ muốn lấy một Booking duy nhất (như tham số), code dưới đây là chính xác.
+     * @param int $booking_id ID của Booking
+     * @return PDOStatement
      */
     public function getBookingsForAttendance($booking_id) {
         $query = "SELECT 
@@ -225,15 +274,35 @@ class Booking {
                       b.so_nguoi_lon, 
                       b.so_tre_em,
                       (b.so_nguoi_lon + b.so_tre_em) AS tong_khach 
-                  FROM bookings b
-                  JOIN customers c ON b.customer_id = c.id
-                  WHERE b.id = :booking_id 
-                  AND b.trang_thai = 'Đã xác nhận' /* <--- ĐIỀU KIỆN TẠI ĐÂY */
-                  ORDER BY b.id ASC";
+                    FROM bookings b
+                    JOIN customers c ON b.customer_id = c.id
+                    WHERE b.id = :booking_id 
+                      AND b.trang_thai = 'Đã xác nhận'
+                    ORDER BY b.id ASC";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":booking_id", $booking_id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt;
     }
+    public function getDetailsById($id) {
+    $query = "SELECT 
+                b.*, 
+                t.ten_tour, 
+                c.ho_ten AS customer_name,
+                u.ho_ten AS user_name
+              FROM " . $this->table . " b
+              JOIN tours t ON b.tour_id = t.id
+              JOIN customers c ON b.customer_id = c.id
+              LEFT JOIN users u ON b.user_id = u.id
+              WHERE b.id = :id 
+              LIMIT 0,1";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+    
 }

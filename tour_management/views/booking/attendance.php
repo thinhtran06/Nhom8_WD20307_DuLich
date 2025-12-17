@@ -28,7 +28,7 @@ require_once 'views/layout/header.php';
                             <th>Trạng Thái Gần Nhất</th>
                             <th>Điểm Danh Lần Này</th>
                             <th>Ghi Chú Lần Này</th>
-                            <th>Lịch Sử</th> 
+                            <!-- <th>Lịch Sử</th>  -->
                         </tr>
                     </thead>
                     <tbody>
@@ -82,7 +82,7 @@ require_once 'views/layout/header.php';
                                             placeholder="Lý do vắng mặt, số phòng,..." 
                                             value="<?php echo htmlspecialchars($guest['latest_log']['notes'] ?? ''); ?>">
                                 </td>
-                                <td>
+                                <!-- <td>
                                     <button type="button" class="btn btn-sm btn-info" 
                                             data-bs-toggle="modal" 
                                             data-bs-target="#historyModal" 
@@ -90,7 +90,7 @@ require_once 'views/layout/header.php';
                                             data-guest-name="<?php echo htmlspecialchars($guest['ho_ten']); ?>">
                                         <i class="fas fa-history"></i> Log
                                     </button>
-                                </td>
+                                </td> -->
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
