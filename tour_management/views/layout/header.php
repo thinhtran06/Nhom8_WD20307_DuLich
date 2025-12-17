@@ -33,12 +33,6 @@
 <nav class="col-md-2 d-none d-md-block bg-light sidebar">
     <div class="sidebar-sticky">
         <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link <?php echo (!isset($_GET['action']) || $_GET['action'] == 'dashboard') ? 'active' : ''; ?>" 
-                    href="index.php?action=dashboard">
-                    📊 Dashboard
-                </a>
-            </li>
           <?php
 // Lấy action hiện tại từ URL
 $currentAction = $_GET['action'] ?? '';
@@ -92,16 +86,6 @@ $isCategoryActive = in_array($currentAction, $categoryActions);
                     <li>
                         <a href="index.php?action=tour_create" class="<?php echo (isset($_GET['action']) && $_GET['action'] == 'tour_create') ? 'active' : ''; ?>">
                             ➕ Tạo Tour Mới
-                        </a>
-                    </li>
-                    <li>
-                        <a href="index.php?action=tour_index&status=active" class="<?php echo (isset($_GET['status']) && $_GET['status'] == 'active') ? 'active' : ''; ?>">
-                            ✅ Tour Đang Hoạt Động
-                        </a>
-                    </li>
-                    <li>
-                        <a href="index.php?action=tour_index&status=expired" class="<?php echo (isset($_GET['status']) && $_GET['status'] == 'expired') ? 'active' : ''; ?>">
-                            ⏰ Tour Hết Hạn
                         </a>
                     </li>
                 </ul>
@@ -171,15 +155,15 @@ $isCategoryActive = in_array($currentAction, $categoryActions);
             </li>
             </li>
             
-       <li class="nav-item">
- <a class="nav-link <?php echo (isset($_GET['action']) && $_GET['action'] == 'attendance_index') ? 'active' : ''; ?>" 
+       <!-- <li class="nav-item">
+ <a class="nav-link 
                     href="index.php?action=attendance_index">
                     📋 Quản Lý Điểm Danh
                 </a>
-            </li>
+            </li> -->
             <li class="nav-item">
                 <a class="nav-link <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'hdv_') === 0) ? 'active' : ''; ?>" 
-                    href="index.php?action=hdv_index">
+                    href="index.php?action=guide_index">
                     👨‍💼 Quản Lý Hướng Dẫn Viên
                 </a>
             </li>

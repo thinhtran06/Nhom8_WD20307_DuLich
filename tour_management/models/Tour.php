@@ -198,5 +198,15 @@ class Tour {
         $stmt->execute();
         return $stmt;
     }
+    // models/Tour.php (BỔ SUNG PHƯƠNG THỨC NÀY)
+
+public function getPriceById($tour_id) {
+    $query = "SELECT gia_tour FROM " . $this->table . " WHERE id = ? LIMIT 0,1";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(1, $tour_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ? (float)$row['gia_tour'] : 0.00;
+}
 }
 ?>

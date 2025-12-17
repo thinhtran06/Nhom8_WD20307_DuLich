@@ -16,10 +16,10 @@ class Booking {
     public $so_nguoi_lon;
     public $so_tre_em;
     public $trang_thai; 
-    public $tong_tien;       // <-- BỔ SUNG: Bắt buộc NOT NULL
-    public $da_thanh_toan;   // <-- BỔ SUNG
-    public $con_lai;         // <-- BỔ SUNG: Bắt buộc NOT NULL
-    public $ghi_chu;         // <-- BỔ SUNG (Nếu có trong schema và muốn quản lý)
+    public $tong_tien; 
+    public $da_thanh_toan; 
+    public $con_lai; 
+    public $ghi_chu; 
 
     public function __construct($db) {
         $this->conn = $db;
@@ -27,12 +27,14 @@ class Booking {
 
     // --- PHƯƠNG THỨC CRUD CƠ BẢN ---
 
-    // Lấy tất cả Booking kèm chi tiết Tour và Khách hàng
+    /**
+     * Lấy tất cả Booking kèm chi tiết Tour và Khách hàng đại diện.
+     */
     public function getAllBookingsWithDetails() {
         $query = "SELECT 
-                    b.*, 
-                    t.ten_tour, 
-                    c.ho_ten
+                      b.*, 
+                      t.ten_tour, 
+                      c.ho_ten
                   FROM " . $this->table . " b
                   JOIN tours t ON b.tour_id = t.id
                   JOIN customers c ON b.customer_id = c.id
@@ -42,7 +44,9 @@ class Booking {
         return $stmt;
     }
 
-    // Lấy thông tin Booking theo ID và gán vào thuộc tính (ĐÃ CẬP NHẬT)
+    /**
+     * Lấy thông tin Booking theo ID và gán vào thuộc tính.
+     */
     public function getById() {
         $query = "SELECT * FROM " . $this->table . " WHERE id = ? LIMIT 0,1";
         $stmt = $this->conn->prepare($query);
@@ -52,27 +56,28 @@ class Booking {
         if ($stmt->execute()) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if($row) {
-                // Gán các thuộc tính
                 $this->tour_id = $row['tour_id'];
                 $this->customer_id = $row['customer_id'];
-                $this->loai_khach = $row['loai_khach'];
+                // $this->loai_khach = $row['loai_khach'];
                 $this->user_id = $row['user_id'];
                 $this->ma_dat_tour = $row['ma_dat_tour'];
                 $this->ngay_dat = $row['ngay_dat'];
                 $this->so_nguoi_lon = $row['so_nguoi_lon'];
                 $this->so_tre_em = $row['so_tre_em'];
                 $this->trang_thai = $row['trang_thai'];
-                $this->tong_tien = $row['tong_tien'];      // <-- BỔ SUNG
-                $this->da_thanh_toan = $row['da_thanh_toan']; // <-- BỔ SUNG
-                $this->con_lai = $row['con_lai'];          // <-- BỔ SUNG
-                $this->ghi_chu = $row['ghi_chu'];          // <-- BỔ SUNG
+                $this->tong_tien = $row['tong_tien']; 
+                $this->da_thanh_toan = $row['da_thanh_toan']; 
+                $this->con_lai = $row['con_lai']; 
+                $this->ghi_chu = $row['ghi_chu']; 
                 return true;
             }
         }
         return false;
     }
 
-    // Tạo Booking mới (ĐÃ CẬP NHẬT)
+    /**
+     * Tạo Booking mới.
+     */
     public function create() {
         $query = "INSERT INTO " . $this->table . " 
                   SET tour_id=:tour_id, customer_id=:customer_id, user_id=:user_id,
@@ -92,15 +97,17 @@ class Booking {
         $stmt->bindParam(":so_nguoi_lon", $this->so_nguoi_lon, PDO::PARAM_INT);
         $stmt->bindParam(":so_tre_em", $this->so_tre_em, PDO::PARAM_INT);
         $stmt->bindParam(":trang_thai", $this->trang_thai);
-        $stmt->bindParam(":tong_tien", $this->tong_tien);        // <-- BIND THÊM
-        $stmt->bindParam(":da_thanh_toan", $this->da_thanh_toan);  // <-- BIND THÊM
-        $stmt->bindParam(":con_lai", $this->con_lai);            // <-- BIND THÊM
-        $stmt->bindParam(":ghi_chu", $this->ghi_chu);            // <-- BIND THÊM
+        $stmt->bindParam(":tong_tien", $this->tong_tien); 
+        $stmt->bindParam(":da_thanh_toan", $this->da_thanh_toan); 
+        $stmt->bindParam(":con_lai", $this->con_lai); 
+        $stmt->bindParam(":ghi_chu", $this->ghi_chu); 
 
         return $stmt->execute();
     }
 
-    // Cập nhật Booking (ĐÃ CẬP NHẬT)
+    /**
+     * Cập nhật Booking.
+     */
     public function update() {
         $query = "UPDATE " . $this->table . " 
                   SET tour_id=:tour_id, customer_id=:customer_id, 
@@ -120,15 +127,17 @@ class Booking {
         $stmt->bindParam(":so_nguoi_lon", $this->so_nguoi_lon, PDO::PARAM_INT);
         $stmt->bindParam(":so_tre_em", $this->so_tre_em, PDO::PARAM_INT);
         $stmt->bindParam(":trang_thai", $this->trang_thai);
-        $stmt->bindParam(":tong_tien", $this->tong_tien);        // <-- BIND THÊM
-        $stmt->bindParam(":da_thanh_toan", $this->da_thanh_toan);  // <-- BIND THÊM
-        $stmt->bindParam(":con_lai", $this->con_lai);            // <-- BIND THÊM
-        $stmt->bindParam(":ghi_chu", $this->ghi_chu);            // <-- BIND THÊM
+        $stmt->bindParam(":tong_tien", $this->tong_tien); 
+        $stmt->bindParam(":da_thanh_toan", $this->da_thanh_toan); 
+        $stmt->bindParam(":con_lai", $this->con_lai); 
+        $stmt->bindParam(":ghi_chu", $this->ghi_chu); 
 
         return $stmt->execute();
     }
     
-    // Xóa Booking
+    /**
+     * Xóa Booking.
+     */
     public function delete() {
         $query = "DELETE FROM " . $this->table . " WHERE id = ?";
         $stmt = $this->conn->prepare($query);
@@ -137,19 +146,46 @@ class Booking {
         return $stmt->execute();
     }
 
-    // --- PHƯƠNG THỨC HỖ TRỢ ĐIỂM DANH (Cần thiết cho AttendanceController) ---
+    /**
+     * Cập nhật nhanh trạng thái Booking.
+     */
+    public function updateStatus($new_status) {
+        $query = "UPDATE " . $this->table . "
+                  SET trang_thai = :trang_thai, 
+                      updated_at = NOW()
+                  WHERE id = :id";
+        
+        $stmt = $this->conn->prepare($query);
+        
+        // Làm sạch dữ liệu
+        $new_status = htmlspecialchars(strip_tags($new_status));
+        $this->id = htmlspecialchars(strip_tags($this->id));
 
-    // 1. Lấy danh sách các Chuyến Đi (Booking đã xác nhận) để chọn điểm danh
+        // Gán giá trị
+        $stmt->bindParam(':trang_thai', $new_status);
+        $stmt->bindParam(':id', $this->id);
+        
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
+
+    // --- PHƯƠNG THỨC HỖ TRỢ ĐIỂM DANH (ATTENDANCE) ---
+
+    /**
+     * Lấy danh sách các chuyến đi (Tour Runs) đang hoạt động để chọn điểm danh.
+     */
     public function getDistinctTourRuns() {
         $query = "SELECT 
-                    b.id AS booking_id, 
-                    b.tour_id,
-                    t.ten_tour, 
-                    b.ngay_dat AS ngay_khoi_hanh, 
-                    t.so_ngay 
+                      b.id AS booking_id, 
+                      b.tour_id,
+                      t.ten_tour, 
+                      b.ngay_dat AS ngay_khoi_hanh, 
+                      t.so_ngay 
                   FROM bookings b
                   JOIN tours t ON b.tour_id = t.id
-                  WHERE b.trang_thai = 'Đã xác nhận' 
+                  WHERE b.trang_thai = 'Đã xác nhận'  /* <--- ĐIỀU KIỆN TẠI ĐÂY */
                   AND DATE_ADD(b.ngay_dat, INTERVAL t.so_ngay DAY) >= CURDATE()
                   ORDER BY b.ngay_dat DESC";
 
@@ -158,14 +194,16 @@ class Booking {
         return $stmt;
     }
 
-    // 2. Lấy thông tin Tour Run (Booking) để hiển thị chi tiết
+    /**
+     * Lấy thông tin Tour Run (Booking) để hiển thị chi tiết.
+     */
     public function getTourInfoByBookingId($booking_id) {
         $query = "SELECT 
-                    b.id AS booking_id,
-                    t.id AS tour_id,
-                    t.ten_tour, 
-                    t.so_ngay,
-                    b.ngay_dat AS ngay_khoi_hanh
+                      b.id AS booking_id,
+                      t.id AS tour_id,
+                      t.ten_tour, 
+                      t.so_ngay,
+                      b.ngay_dat AS ngay_khoi_hanh
                   FROM bookings b
                   JOIN tours t ON b.tour_id = t.id
                   WHERE b.id = :booking_id
@@ -177,18 +215,20 @@ class Booking {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
-    // 3. Lấy danh sách Booking (tên người đại diện) cho Attendance Check
+    /**
+     * Lấy danh sách Booking (tên người đại diện) cho Attendance Check.
+     */
     public function getBookingsForAttendance($booking_id) {
         $query = "SELECT 
-                    b.id AS booking_id, 
-                    c.ho_ten, 
-                    b.so_nguoi_lon, 
-                    b.so_tre_em,
-                    (b.so_nguoi_lon + b.so_tre_em) AS tong_khach 
+                      b.id AS booking_id, 
+                      c.ho_ten, 
+                      b.so_nguoi_lon, 
+                      b.so_tre_em,
+                      (b.so_nguoi_lon + b.so_tre_em) AS tong_khach 
                   FROM bookings b
                   JOIN customers c ON b.customer_id = c.id
                   WHERE b.id = :booking_id 
-                  AND b.trang_thai = 'Đã xác nhận'
+                  AND b.trang_thai = 'Đã xác nhận' /* <--- ĐIỀU KIỆN TẠI ĐÂY */
                   ORDER BY b.id ASC";
 
         $stmt = $this->conn->prepare($query);
@@ -197,4 +237,3 @@ class Booking {
         return $stmt;
     }
 }
-// KHÔNG CẦN THẺ ĐÓNG PHP ?>

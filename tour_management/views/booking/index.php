@@ -7,7 +7,7 @@ include 'views/layout/header.php';
 
 <div class="container" style="margin-top: 100px;">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Quản Lý Đặt Tour (Bookings) demo nhe</h1>
+        <h1>Quản Lý Đặt Tour (Bookings)</h1>
         <a href="index.php?action=booking_create" class="btn btn-success">
             <i class="fas fa-plus"></i> Tạo Booking Mới
         </a>
