@@ -358,6 +358,7 @@ class BookingController {
             header("Location: index.php?action=booking_attendance&id=$id"); 
             exit();
         }
+        
 
         // 3. Chuẩn bị dữ liệu cho View (GET request)
         $customer_data = $this->customer->getById($this->booking->customer_id);
@@ -380,4 +381,22 @@ class BookingController {
         $page_title = "Điểm Danh Khách Hàng - Mã: " . $booking['ma_dat_tour'];
         require_once 'views/booking/attendance.php';
     }
+    public function show($id) {
+    // 1. Lấy thông tin chi tiết Booking (kèm theo Tên Tour và Tên Khách Hàng)
+    // Giả định Model Booking của bạn có hàm getDetailsById($id)
+    $bookingData = $this->booking->getDetailsById($id); 
+
+    if (!$bookingData) {
+        $_SESSION['error_message'] = "Không tìm thấy thông tin đặt chỗ!";
+        header("Location: index.php?action=booking_index");
+        exit();
+    }
+
+    $page_title = "Chi Tiết Đặt Chỗ: " . $bookingData['ma_dat_tour'];
+    
+    // Gán vào biến $booking để sử dụng trong View bạn vừa viết
+    $booking = $bookingData;
+
+    require_once 'views/booking/show.php';
+}
 }

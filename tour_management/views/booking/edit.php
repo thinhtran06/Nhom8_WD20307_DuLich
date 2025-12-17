@@ -9,7 +9,7 @@
 include 'views/layout/header.php';
 ?>
 
-<div class="container mt-4">
+<div class="container mb-5" style="margin-top: 80px;">
     <h1>Chỉnh Sửa Booking Mã: <?php echo htmlspecialchars($booking['ma_dat_tour'] ?? 'N/A'); ?></h1>
     <a href="index.php?action=booking_index" class="btn btn-secondary mb-3">
         <i class="fas fa-arrow-left"></i> Quay lại danh sách

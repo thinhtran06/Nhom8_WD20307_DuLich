@@ -285,4 +285,24 @@ class Booking {
         $stmt->execute();
         return $stmt;
     }
+    public function getDetailsById($id) {
+    $query = "SELECT 
+                b.*, 
+                t.ten_tour, 
+                c.ho_ten AS customer_name,
+                u.ho_ten AS user_name
+              FROM " . $this->table . " b
+              JOIN tours t ON b.tour_id = t.id
+              JOIN customers c ON b.customer_id = c.id
+              LEFT JOIN users u ON b.user_id = u.id
+              WHERE b.id = :id 
+              LIMIT 0,1";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+    
 }

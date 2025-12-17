@@ -94,16 +94,6 @@ $isCategoryActive = in_array($currentAction, $categoryActions);
                             ➕ Tạo Tour Mới
                         </a>
                     </li>
-                    <li>
-                        <a href="index.php?action=tour_index&status=active" class="<?php echo (isset($_GET['status']) && $_GET['status'] == 'active') ? 'active' : ''; ?>">
-                            ✅ Tour Đang Hoạt Động
-                        </a>
-                    </li>
-                    <li>
-                        <a href="index.php?action=tour_index&status=expired" class="<?php echo (isset($_GET['status']) && $_GET['status'] == 'expired') ? 'active' : ''; ?>">
-                            ⏰ Tour Hết Hạn
-                        </a>
-                    </li>
                 </ul>
             </li>
             
@@ -171,12 +161,12 @@ $isCategoryActive = in_array($currentAction, $categoryActions);
             </li>
             </li>
             
-       <li class="nav-item">
- <a class="nav-link <?php echo (isset($_GET['action']) && $_GET['action'] == 'attendance_index') ? 'active' : ''; ?>" 
+       <!-- <li class="nav-item">
+ <a class="nav-link 
                     href="index.php?action=attendance_index">
                     📋 Quản Lý Điểm Danh
                 </a>
-            </li>
+            </li> -->
             <li class="nav-item">
                 <a class="nav-link <?php echo (isset($_GET['action']) && strpos($_GET['action'], 'hdv_') === 0) ? 'active' : ''; ?>" 
                     href="index.php?action=guide_index">
