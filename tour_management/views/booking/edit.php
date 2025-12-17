@@ -68,6 +68,25 @@ include 'views/layout/header.php';
                     </select>
                 </div>
 
+                <div class="col-md-6 mb-3">
+    <label for="guide_id" class="form-label">Hướng Dẫn Viên</label>
+    <select name="guide_id" id="guide_id" class="form-control">
+    <option value="">-- Chưa phân công --</option>
+    <?php
+    if (!empty($guides)):
+        $current_guide_id = $booking['guide_id'] ?? null;
+        foreach ($guides as $guide):
+    ?>
+        <option value="<?= $guide['id'] ?>"
+            <?= ($current_guide_id == $guide['id']) ? 'selected' : '' ?>>
+            <?= htmlspecialchars($guide['ho_ten']) ?> (ID: <?= $guide['id'] ?>)
+        </option>
+    <?php
+        endforeach;
+    endif;
+    ?>
+</select>
+</div>
                 <div class="col-md-4 mb-3">
                     <label for="ngay_dat" class="form-label">Ngày Đặt/Khởi hành (*)</label>
                     <input type="date" name="ngay_dat" id="ngay_dat" class="form-control" 

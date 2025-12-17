@@ -28,6 +28,7 @@ include 'views/layout/header.php';
                         <th>Mã Booking</th>
                         <th>Tên Tour</th>
                         <th>Tên Khách Hàng</th>
+                        <th>Hướng Dẫn Viên</th>
                         <th>Ngày Đặt</th>
                         <th>SL Khách</th>
                         <th>Tổng Tiền (VNĐ)</th>
@@ -55,6 +56,7 @@ include 'views/layout/header.php';
                             <td><?php echo htmlspecialchars($booking['ma_dat_tour']); ?></td>
                             <td><?php echo htmlspecialchars($booking['ten_tour'] ?? 'N/A'); ?></td> 
                             <td><?php echo htmlspecialchars($booking['ho_ten'] ?? 'N/A'); ?></td>
+                            <td><?php echo htmlspecialchars($booking['guide_name'] ?? 'Chưa phân công'); ?></td>
                             <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($booking['ngay_dat']))); ?></td>
                             <td><?php echo htmlspecialchars($tong_khach); ?></td>
                             <td><?php echo $tong_tien; ?></td> 
