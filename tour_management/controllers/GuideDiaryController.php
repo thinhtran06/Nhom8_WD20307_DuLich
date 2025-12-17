@@ -26,7 +26,7 @@ class GuideDiaryController {
         // Tour
         $tourModel = new Tour($this->conn);
         $tourModel->id = $tour_id;
-        $tour = $tourModel->getById();
+        $tour = $tourModel->getById($tour_id);
 
         // Guide
         $guideModel = new Guide($this->conn);
