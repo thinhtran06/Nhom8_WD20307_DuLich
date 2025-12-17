@@ -29,14 +29,14 @@ try {
 // ==================== 4. ROUTES ====================
 $routes = [
 
+    // 🌍 TRANG CHÀO (KHÔNG SIDEBAR)
     // ===== AUTH =====
     'login'                 => ['Auth', 'login', false],
     'process_login'         => ['Auth', 'processLogin', false],
     'logout'                => ['Auth', 'logout', false],
 
     // ===== DASHBOARD (TRANG CHỦ) =====
-    ''                      => ['Dashboard', 'index', true],
-    'dashboard'             => ['Dashboard', 'index', true],
+    ''                      => ['Tour', 'index', true],
 
     // ===== TOUR =====
     'tour_index'            => ['Tour', 'index', true],
@@ -115,7 +115,7 @@ $routes = [
     'guide_diary_delete'    => ['GuideDiary', 'delete', true],
 
     'guide_work_assign'     => ['GuideWork', 'assignForm', true],
-    'guide_work_assign_save'=> ['GuideWork', 'assignSave', true],
+    'guide_work_assign_save' => ['GuideWork', 'assignSave', true],
 ];
 
 // ==================== 5. DISPATCH ====================
@@ -141,9 +141,15 @@ if ($method === 'listByLoaiTour') {
     $loai = ($action === 'tour_trong_nuoc') ? 'Trong nước' : 'Ngoài nước';
     $controller->$method($loai);
 } elseif (in_array($method, [
-    'update', 'updateStatus', 'checkAttendance',
-    'edit', 'delete', 'destroy', 'show',
-    'customerDelete', 'tourDetail'
+    'update',
+    'updateStatus',
+    'checkAttendance',
+    'edit',
+    'delete',
+    'destroy',
+    'show',
+    'customerDelete',
+    'tourDetail'
 ])) {
     $controller->$method($id);
 } else {
