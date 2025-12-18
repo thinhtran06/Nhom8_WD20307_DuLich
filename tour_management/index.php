@@ -63,6 +63,7 @@ $routes = [
     'booking_create'        => ['Booking', 'create', true],
     'booking_edit'          => ['Booking', 'edit', true],
     'booking_delete'        => ['Booking', 'delete', true],
+    'booking_stats'    => ['Booking', 'statistics', true],
     'booking_show'          => ['Booking', 'show', true],
     'booking_update_status' => ['Booking', 'updateStatus', true],
     'booking_attendance'    => ['Booking', 'checkAttendance', true],

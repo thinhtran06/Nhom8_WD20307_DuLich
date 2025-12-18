@@ -1,31 +1,48 @@
 <?php include "views/layout/header.php"; ?>
 
 <?php 
-if (!$guide) {
+if (empty($guide)) {
     echo "<div class='alert alert-danger mt-4'>Không tìm thấy hướng dẫn viên.</div>";
     echo "<a href='index.php?action=guide_index' class='btn btn-primary'>Quay lại</a>";
     include "views/layout/footer.php";
     exit;
 }
 
-$guide_id = (int)$guide->id;
+$guide_id = (int)$guide['id'];
+
+// Chuẩn hóa dữ liệu để tránh null
+$ho_ten       = $guide->ho_ten       ?? '';
+$loai_hdv     = $guide->loai_hdv     ?? '';
+$chuyen_tuyen = $guide->chuyen_tuyen ?? '';
+$ngon_ngu     = $guide->ngon_ngu     ?? '';
 ?>
+
 <div style="margin-left:260px; margin-top:30px; padding:20px;">
+
 <h3 class="mt-3">
-    Lịch làm việc của Hướng Dẫn Viên: 
-    <span class="text-primary fw-bold"><?= htmlspecialchars($guide->ho_ten ?? '') ?></span>
+    Lịch làm việc của Hướng Dẫn Viên:
+    <span class="text-primary fw-bold">
+        <?= htmlspecialchars($ho_ten, ENT_QUOTES, 'UTF-8') ?>
+    </span>
 </h3>
 
 <p class="text-muted">
-    <strong>Loại HDV:</strong> 
-    <span class="badge bg-info text-dark"><?= htmlspecialchars($guide->loai_hdv ?? '') ?></span>
+    <strong>Loại HDV:</strong>
+    <span class="badge bg-info text-dark">
+        <?= htmlspecialchars($loai_hdv, ENT_QUOTES, 'UTF-8') ?>
+    </span>
 
-    <strong class="ms-3">Chuyên tuyến:</strong> 
-    <span class="badge bg-primary"><?= htmlspecialchars($guide->chuyen_tuyen ?? '') ?></span>
+    <strong class="ms-3">Chuyên tuyến:</strong>
+    <span class="badge bg-primary">
+        <?= htmlspecialchars($chuyen_tuyen, ENT_QUOTES, 'UTF-8') ?>
+    </span>
 
-    <strong class="ms-3">Ngoại ngữ:</strong> 
-    <span class="badge bg-secondary"><?= htmlspecialchars($guide->ngon_ngu ?? '') ?></span>
+    <strong class="ms-3">Ngoại ngữ:</strong>
+    <span class="badge bg-secondary">
+        <?= htmlspecialchars($ngon_ngu, ENT_QUOTES, 'UTF-8') ?>
+    </span>
 </p>
+
 
 <hr>
 
@@ -58,8 +75,8 @@ $guide_id = (int)$guide->id;
 
                 <tr>
                     <td><?= htmlspecialchars($s->ten_tour ?? '') ?></td>
-                    <td><?= htmlspecialchars($start) ?></td>
-                    <td><?= htmlspecialchars($end) ?></td>
+                    <td><?= htmlspecialchars($start ?? '') ?></td>   <!-- Ngày khởi hành -->
+                    <td><?= htmlspecialchars($end ?? '') ?></td>     <!-- Ngày kết thúc -->
                     <td><?= htmlspecialchars($s->diem_khoi_hanh ?? '') ?></td>
                     <td><?= htmlspecialchars($s->diem_den ?? '') ?></td>
 
@@ -80,12 +97,6 @@ $guide_id = (int)$guide->id;
             </a>
         </li>
 
-        <li>
-            <a class="dropdown-item"
-                href="index.php?action=guide_special_request&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">
-                Yêu cầu đặc biệt
-            </a>
-        </li>
 
         <li>
             <a class="dropdown-item"
@@ -93,21 +104,6 @@ $guide_id = (int)$guide->id;
                 Nhật ký tour
             </a>
         </li>
-
-        <li>
-            <a class="dropdown-item"
-                href="index.php?action=guide_checkin&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">
-                Điểm danh
-            </a>
-        </li>
-
-        <li>
-            <a class="dropdown-item"
-                href="index.php?action=guide_customers&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>">
-                Danh sách khách
-            </a>
-        </li>
-
     </ul>
 </div>
 

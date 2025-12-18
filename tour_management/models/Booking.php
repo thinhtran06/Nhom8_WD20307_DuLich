@@ -304,5 +304,25 @@ class Booking {
 
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
+public function getStatistics() {
+    $query = "SELECT 
+                COUNT(*) as total_bookings,
+                -- Doanh thu dự kiến: Tổng giá trị các đơn (trừ đơn hủy)
+                SUM(CASE WHEN trang_thai != 'Đã hủy' THEN tong_tien ELSE 0 END) as total_revenue,
+                
+                -- THỰC NHẬN: Tính tổng tất cả tiền khách đã trả của các đơn chưa hủy 
+                -- (Bao gồm cả tiền cọc của đơn Đã xác nhận và tiền đủ của đơn Hoàn thành)
+                SUM(CASE WHEN trang_thai != 'Đã hủy' THEN da_thanh_toan ELSE 0 END) as actual_received,
+                
+                COUNT(CASE WHEN trang_thai = 'Đã hủy' THEN 1 END) as canceled_count,
+                COUNT(CASE WHEN trang_thai = 'Hoàn thành' THEN 1 END) as completed_count,
+                COUNT(CASE WHEN trang_thai = 'Đã xác nhận' THEN 1 END) as confirmed_count,
+                COUNT(CASE WHEN trang_thai = 'Chờ xác nhận' THEN 1 END) as pending_count
+              FROM " . $this->table;
+              
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
     
 }

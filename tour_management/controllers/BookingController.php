@@ -399,4 +399,39 @@ class BookingController {
 
     require_once 'views/booking/show.php';
 }
+public function attendance($id) {
+    // 1. Lấy dữ liệu đơn hàng từ Model
+    $booking = $this->booking->getDetailsById($id);
+
+    // 2. Kiểm tra điều kiện trạng thái
+    if (!$booking || $booking['trang_thai'] !== 'Đã xác nhận') {
+        // Nếu không phải 'Đã xác nhận', thông báo lỗi và đẩy về trang danh sách
+        $_SESSION['error_message'] = "Chỉ những đơn hàng 'Đã xác nhận' mới có thể thực hiện điểm danh!";
+        header("Location: index.php?action=booking_index");
+        exit();
+    }
+
+    // 3. Nếu thỏa mãn, tiếp tục load trang điểm danh như bình thường
+    require_once 'views/booking/attendance.php';
+}
+// controllers/BookingController.php
+
+public function statistics() {
+    // 1. Gọi hàm lấy dữ liệu từ Model (đã viết ở bước trước)
+    $stats = $this->booking->getStatistics();
+    
+    // 2. Kiểm tra nếu không có dữ liệu thì gán mặc định để tránh lỗi View
+    if (!$stats) {
+        $stats = [
+            'total_bookings' => 0,
+            'total_revenue' => 0,
+            'actual_received' => 0,
+            'canceled_count' => 0,
+            'completed_count' => 0
+        ];
+    }
+
+    // 3. Load file giao diện thống kê
+    include 'views/booking/statistics.php';
+}
 }

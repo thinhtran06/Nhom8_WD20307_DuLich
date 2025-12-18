@@ -107,221 +107,180 @@ class GuideController {
     ============================ */
     public function schedule() {
 
-        if (!isset($_GET['id'])) die("Thiếu ID hướng dẫn viên");
-
-        $guide_id = intval($_GET['id']);
-
-        require_once "models/Guide.php";
-        require_once "models/GuideSchedule.php";
-
-        $guide = (new Guide($this->conn))->getById($guide_id);
-        $schedule = (new GuideSchedule($this->conn))->getScheduleByGuide($guide_id);
-
-        include "views/guides/schedule.php";
+    if (!isset($_GET['guide_id']) && !isset($_GET['id'])) {
+        die("Thiếu ID hướng dẫn viên");
     }
+
+    // Ưu tiên guide_id nếu hợp lệ, nếu không dùng id
+    $guide_id = (isset($_GET['guide_id']) && intval($_GET['guide_id']) > 0)
+        ? intval($_GET['guide_id'])
+        : intval($_GET['id']);
+
+    require_once "models/Guide.php";
+    require_once "models/Booking.php";
+
+    $guide = (new Guide($this->conn))->getById($guide_id);
+
+    if (!$guide) {
+        die("Không tìm thấy hướng dẫn viên");
+    }
+
+    $schedule = (new Booking($this->conn))->getBookingsByGuide($guide_id);
+
+    include "views/guides/schedule.php";
+}
 
     /* ============================
       CHI TIẾT TOUR
     ============================ */
     public function tourDetail() {
 
-        if (!isset($_GET['tour_id']) || !isset($_GET['guide_id']))
-            die("Thiếu tour_id hoặc guide_id");
-
-        $tour_id  = intval($_GET['tour_id']);
-        $guide_id = intval($_GET['guide_id']);
-
-        require_once "models/Tour.php";
-        require_once "models/Booking.php";
-        require_once "models/Guide.php";
-
-        $tour = (new Tour($this->conn))->getById($tour_id);
-        $guide = (new Guide($this->conn))->getById($guide_id);
-        $customers = (new Booking($this->conn))->getCustomersByTour($tour_id);
-
-        include "views/guides/tour_detail.php";
+    if (!isset($_GET['tour_id']) || !isset($_GET['guide_id'])) {
+        die("Thiếu tour_id hoặc guide_id");
     }
 
+    $tour_id  = intval($_GET['tour_id']);
+    $guide_id = intval($_GET['guide_id']);
+
+    require_once "models/Tour.php";
+    require_once "models/Booking.php";
+    require_once "models/Guide.php";
+    require_once "models/TourCustomer.php";
+
+    // ✅ Lấy thông tin tour
+    $tourModel = new Tour($this->conn);
+    $tour = $tourModel->getById($tour_id);
+
+    // ✅ Lấy thông tin HDV
+    $guideModel = new Guide($this->conn);
+    $guide = $guideModel->getById($guide_id);
+
+    // ✅ Lấy booking duy nhất của tour
+    $bookingModel = new Booking($this->conn);
+    $booking = $bookingModel->getByTourId($tour_id);
+
+    if (!$booking) {
+        die("Tour này chưa có booking");
+    }
+
+    // ✅ Lấy khách theo booking_id
+    $tourCustomerModel = new TourCustomer($this->conn);
+    $sql = "SELECT c.*
+        FROM tour_customers tc
+        JOIN customers c ON tc.customer_id = c.id
+        WHERE tc.booking_id = ?";
+
+$stmt = $this->conn->prepare($sql);
+$stmt->execute([$booking['id']]);
+$customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    include "views/guides/tour_detail.php";
+}
     /* ============================
       DANH SÁCH KHÁCH
     ============================ */
-    public function customers() {
+public function customers() {
 
-        if (!isset($_GET['tour_id'])) die("Thiếu tour_id");
-
-        require_once "models/Booking.php";
-
-        $customers = (new Booking($this->conn))->getCustomersByTour($_GET['tour_id']);
-
-        include "views/guides/customers.php";
+    if (!isset($_GET['tour_id']) || !isset($_GET['guide_id'])) {
+        die("Thiếu tour_id hoặc guide_id");
     }
+
+    $tour_id  = intval($_GET['tour_id']);
+    $guide_id = intval($_GET['guide_id']);
+
+    require_once "models/Booking.php";
+    require_once "models/TourCustomer.php";
+
+    // ✅ Lấy booking duy nhất theo tour
+    $bookingModel = new Booking($this->conn);
+    $booking = $bookingModel->getByTourId($tour_id);
+
+    if (!$booking || !isset($booking['id'])) {
+        die("Tour này chưa có booking");
+    }
+
+    // ✅ Lấy khách theo booking_id
+    $tourCustomerModel = new TourCustomer($this->conn);
+    $customers = $tourCustomerModel
+                    ->getGuestsByBookingId($booking['id'])
+                    ->fetchAll(PDO::FETCH_ASSOC);
+
+    include "views/guides/customers.php";
+}
 
     /* ============================
       NHẬT KÝ TOUR
     ============================ */
     public function diary() {
+    $tour_id  = intval($_GET['tour_id'] ?? 0);
+    $guide_id = intval($_GET['guide_id'] ?? 0);
 
-        $tour_id = intval($_GET['tour_id'] ?? 0);
-        $guide_id = intval($_GET['guide_id'] ?? 0);
-
-        require_once "models/Tour.php";
-        require_once "models/Guide.php";
-        require_once "models/GuideDiary.php";
-
-        $tour = (new Tour($this->conn))->getById($tour_id);
-        $guide = (new Guide($this->conn))->getById($guide_id);
-        $entries = (new GuideDiary($this->conn))->getByTour($tour_id);
-
-        include "views/guides/diary_list.php";
+    if (!$tour_id || !$guide_id) {
+        die("Thiếu hoặc sai tour_id / guide_id");
     }
 
-    /* ============================
-      SPECIAL REQUEST
-    ============================ */
-    public function specialRequest() {
+    // Lấy thông tin tour
+    require_once "models/Tour.php";
+    $tourModel = new Tour($this->conn);
+    $tour = $tourModel->getById($tour_id);
 
-    require_once "models/Booking.php";
-    require_once "models/CustomerSpecialRequest.php";
+    // Lấy thông tin hướng dẫn viên
+    require_once "models/Guide.php";
+    $guideModel = new Guide($this->conn);
+    $guide = $guideModel->getById($guide_id);
 
-    $tour_id  = $_GET['tour_id'];
-    $guide_id = $_GET['guide_id'];
+    // Lấy lịch làm việc từ bảng guide_schedule
+    $query = "SELECT * FROM guide_schedule 
+              WHERE tour_id = :tour_id AND guide_id = :guide_id";
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute([
+        ':tour_id' => $tour_id,
+        ':guide_id' => $guide_id
+    ]);
+    $diary = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $customers = (new Booking($this->conn))->getCustomersByTour($tour_id);
-    $requests  = (new CustomerSpecialRequest($this->conn))->getByTour($tour_id);
-
-    // TRUYỀN BIẾN SANG VIEW
-    $data = [
-        'tour_id'   => $tour_id,
-        'guide_id'  => $guide_id,
-        'customers' => $customers,
-        'requests'  => $requests
-    ];
-
-    extract($data); // Giúp view nhận đúng biến
-    include "views/guides/special_request.php";
+    include "views/guides/diary_list.php";
 }
-
-
-
-    public function saveSpecialRequest() {
-
-        require_once "models/CustomerSpecialRequest.php";
-
-        foreach ($_POST['yeu_cau'] as $customer_id => $yc) {
-            (new CustomerSpecialRequest($this->conn))->upsert(
-                $_POST['tour_id'],
-                $customer_id,
-                $_POST['guide_id'],
-                $yc,
-                $_POST['ghi_chu'][$customer_id] ?? ''
-            );
-        }
-
-        header("Location: index.php?action=guide_special_request&tour_id={$_POST['tour_id']}&guide_id={$_POST['guide_id']}&saved=1");
-        exit;
-    }
-
-    /* ============================
-       CHECK-IN
-    ============================ */
-    public function checkin() {
-
-        if (!isset($_GET['tour_id']) || !isset($_GET['guide_id']))
-            die("Thiếu tour_id hoặc guide_id");
-
-        $tour_id  = intval($_GET['tour_id']);
-        $guide_id = intval($_GET['guide_id']);
-        $diem_tap_trung = $_GET['diem'] ?? '';
-
-        require_once "models/Booking.php";
-        require_once "models/CustomerCheckin.php";
-        require_once "models/Tour.php";
-
-        $customers = (new Booking($this->conn))->getCustomersByTour($tour_id);
-        $checkModel = new CustomerCheckin($this->conn);
-
-        $statusMap = $checkModel->getLatestStatusesByTourAndPoint(
-            $tour_id,
-            $diem_tap_trung !== '' ? $diem_tap_trung : null
-        );
-
-        $history = $checkModel->getHistoryByTour($tour_id);
-        $tour = (new Tour($this->conn))->getById($tour_id);
-
-        include "views/guides/checkin.php";
-    }
-
-    public function saveCheckin() {
-
-        require_once "models/CustomerCheckin.php";
-
-        foreach ($_POST['trang_thai'] as $cid => $status) {
-            (new CustomerCheckin($this->conn))->upsert(
-                $_POST['tour_id'],
-                $cid,
-                $_POST['guide_id'],
-                $_POST['diem_tap_trung'],
-                $status
-            );
-        }
-
-        header(
-            "Location: index.php?action=guide_checkin".
-            "&tour_id={$_POST['tour_id']}".
-            "&guide_id={$_POST['guide_id']}".
-            "&diem={$_POST['diem_tap_trung']}"
-        );
-        exit;
-    }
 
     /* ============================
       THÊM KHÁCH HÀNG
     ============================ */
     public function addCustomerForm() {
+    $tour_id = $_GET['tour_id'];
+    $guide_id = $_GET['guide_id'];
+    $booking_id = $_GET['booking_id']; // ✅ BẮT BUỘC PHẢI CÓ
 
-        if (!isset($_GET['tour_id']) || !isset($_GET['guide_id']))
-            die("Thiếu tour_id hoặc guide_id");
-
-        $tour_id = intval($_GET['tour_id']);
-        $guide_id = intval($_GET['guide_id']);
-
-        include "views/guides/customer_add.php";
-    }
+    include "views/guides/add_customer.php";
+}
 
     /* ============================
       LƯU KHÁCH HÀNG
     ============================ */
-    public function customerStore() {
+    public function addCustomerStore() {
+    require_once "models/Customer.php";
+    require_once "models/TourCustomer.php";
 
-        require_once "models/Booking.php";
+    $customerModel = new Customer($this->conn);
+    $tourCustomerModel = new TourCustomer($this->conn);
 
-        if (empty($_POST['tour_id']) || empty($_POST['ho_ten'])) {
-            die("Thiếu dữ liệu cần thiết");
-        }
+    // Lấy dữ liệu từ form
+    $data = [
+        'ho_ten' => $_POST['ho_ten'],
+        'email' => $_POST['email'],
+        'dien_thoai' => $_POST['dien_thoai'],
+        'cmnd_cccd' => $_POST['cmnd_cccd']
+    ];
 
-        $bookingModel = new Booking($this->conn);
+    // ✅ Tạo khách mới
+    $customer_id = $customerModel->createCustomer($data);
 
-        $success = $bookingModel->addCustomer([
-            'tour_id'    => $_POST['tour_id'],
-            'ho_ten'     => $_POST['ho_ten'],
-            'email'      => $_POST['email'],
-            'dien_thoai' => $_POST['dien_thoai'],
-            'gioi_tinh'  => $_POST['gioi_tinh'],
-            'quoc_tich'  => $_POST['quoc_tich'],
-            'ghi_chu'    => $_POST['ghi_chu']
-        ]);
+    // ✅ Gắn khách vào tour (booking_id)
+    $booking_id = $_POST['booking_id'];
+    $tourCustomerModel->createGuestEntry($booking_id, $customer_id);
 
-        if ($success) {
-            header(
-                "Location: index.php?action=guide_customers".
-                "&tour_id={$_POST['tour_id']}".
-                "&guide_id={$_POST['guide_id']}"
-            );
-            exit;
-        } else {
-            die("Lỗi khi thêm khách hàng!");
-        }
-    }
+    header("Location: index.php?action=guide_tour_detail&tour_id=".$_POST['tour_id']."&guide_id=".$_POST['guide_id']);
+    exit;
+}
 
     /* ============================
       XOÁ KHÁCH KHỎI TOUR
@@ -345,7 +304,24 @@ class GuideController {
     header("Location: index.php?action=guide_customers&tour_id=$tour_id&guide_id=$guide_id");
     exit;
 }
+public function deleteCustomer() {
+    require_once "models/Customer.php";
+    require_once "models/TourCustomer.php";
 
+    $customerModel = new Customer($this->conn);
+    $tourCustomerModel = new TourCustomer($this->conn);
+
+    $customer_id = $_GET['customer_id'];
+
+    // Xóa trong tour_customers trước
+    $tourCustomerModel->deleteByCustomer($customer_id);
+
+    // Xóa trong customers
+    $customerModel->deleteCustomer($customer_id);
+
+    header("Location: index.php?action=guide_tour_detail&tour_id=".$_GET['tour_id']."&guide_id=".$_GET['guide_id']);
+    exit;
+}
 
 }
 ?>

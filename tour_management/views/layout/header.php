@@ -173,6 +173,11 @@ $isCategoryActive = in_array($currentAction, $categoryActions);
                     👨‍💼 Quản Lý Hướng Dẫn Viên
                 </a>
             </li>
+            <li class="nav-item">
+    <a class="nav-link" href="index.php?action=booking_stats">
+        <i class="fas fa-chart-bar"></i>  📋Thống Kê
+    </a>
+</li>
             
             <li class="nav-item">
                 <a class="nav-link" href="index.php?action=logout" 

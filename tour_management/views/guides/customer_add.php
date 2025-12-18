@@ -1,11 +1,16 @@
 <?php include "views/layout/header.php"; ?>
-
+<?php var_dump($booking_id); ?>
 <?php
 $tour_id  = $_GET['tour_id'] ?? 0;
 $guide_id = $_GET['guide_id'] ?? 0;
 
 if (!$tour_id || !$guide_id) {
     die("<b>Lỗi:</b> Thiếu tour_id hoặc guide_id");
+}
+
+
+if (!$booking_id) {
+    die("<b>Lỗi:</b> Không tìm thấy booking cho tour này");
 }
 ?>
 
@@ -19,6 +24,7 @@ if (!$tour_id || !$guide_id) {
 
                 <input type="hidden" name="tour_id" value="<?= $tour_id ?>">
                 <input type="hidden" name="guide_id" value="<?= $guide_id ?>">
+                <input type="hidden" name="booking_id" value="<?= $booking_id ?>">
 
                 <div class="form-group mb-3">
                     <label><strong>Họ tên khách *</strong></label>

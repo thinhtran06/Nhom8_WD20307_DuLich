@@ -1,7 +1,5 @@
 <?php 
 // views/booking/index.php
-// $bookings: danh sách booking từ BookingController->index()
-// $message: thông báo (nếu có)
 include 'views/layout/header.php';
 ?>
 
@@ -13,8 +11,6 @@ include 'views/layout/header.php';
         </a>
     </div>
     
-    <?php // Xóa bỏ nút Điểm danh bị đặt sai vị trí ở đây ?>
-
     <?php if (isset($message)): ?>
         <div class="alert alert-success"><?php echo htmlspecialchars($message); ?></div>
     <?php endif; ?>
@@ -39,11 +35,9 @@ include 'views/layout/header.php';
                 </thead>
                 <tbody>
                     <?php 
-                    // Định nghĩa các trạng thái có thể có
                     $statuses = ['Chờ xác nhận', 'Đã xác nhận', 'Đã hủy', 'Hoàn thành'];
                     
                     while ($booking = $bookings->fetch(PDO::FETCH_ASSOC)): 
-                        // Tính toán và định dạng số tiền
                         $tong_khach = (int)$booking['so_nguoi_lon'] + (int)$booking['so_tre_em'];
                         $tong_tien = number_format($booking['tong_tien'], 0, ',', '.');
                         $da_thanh_toan = number_format($booking['da_thanh_toan'], 0, ',', '.');
@@ -66,7 +60,8 @@ include 'views/layout/header.php';
                             <td>
                                 <form action="index.php?action=booking_update_status&id=<?php echo $booking['id']; ?>" method="POST" style="margin: 0; display: inline-block;">
                                     <select name="trang_thai" class="form-control form-control-sm" 
-                                            onchange="this.form.submit()" style="max-width: 130px;">
+                                            onchange="this.form.submit()" style="max-width: 130px;"
+                                            <?php echo ($booking['trang_thai'] == 'Hoàn thành') ? 'disabled' : ''; ?>>
                                         <?php foreach ($statuses as $status): ?>
                                             <option value="<?php echo $status; ?>" 
                                                 <?php echo ($booking['trang_thai'] == $status) ? 'selected' : ''; ?>>
@@ -74,13 +69,19 @@ include 'views/layout/header.php';
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
+                                    
+                                    <?php if ($booking['trang_thai'] == 'Hoàn thành'): ?>
+                                        <input type="hidden" name="trang_thai" value="Hoàn thành">
+                                    <?php endif; ?>
                                 </form>
                             </td>
                             
                             <td style="min-width: 250px;">
-                                <a href="index.php?action=booking_attendance&id=<?php echo $booking['id']; ?>" class="btn btn-warning mb-1 me-1" title="Điểm danh hoạt động">
-                                    <i class="fas fa-user-check"></i> Điểm Danh
-                                </a>
+                                <?php if ($booking['trang_thai'] === 'Đã xác nhận' || $booking['trang_thai'] === 'Hoàn thành'): ?>
+                                    <a href="index.php?action=booking_attendance&id=<?php echo $booking['id']; ?>" class="btn btn-warning mb-1 me-1" title="Điểm danh hoạt động">
+                                        <i class="fas fa-user-check"></i> Điểm Danh
+                                    </a>
+                                <?php endif; ?>
                                 
                                 <a href="index.php?action=booking_edit&id=<?php echo $booking['id']; ?>" class="btn btn-info mb-1 me-1" title="Chỉnh sửa chi tiết Booking">
                                     <i class="fas fa-edit"></i> Sửa
@@ -92,11 +93,10 @@ include 'views/layout/header.php';
                                     <i class="fas fa-trash"></i> Xóa
                                 </a>
                                 <a href="index.php?action=booking_show&id=<?php echo $booking['id']; ?>" 
-       class="btn btn-primary px-3" 
-       style="font-weight: 500;">
-        <i class="fas fa-eye me-1"></i> Xem
-    </a>
-                                
+                                   class="btn btn-primary px-3" 
+                                   style="font-weight: 500;">
+                                    <i class="fas fa-eye me-1"></i> Xem
+                                </a>
                             </td>
                         </tr>
                     <?php endwhile; ?>
@@ -107,6 +107,5 @@ include 'views/layout/header.php';
         <div class="alert alert-warning">Chưa có Booking nào trong hệ thống.</div>
     <?php endif; ?>
 </div>
-<
 
 <?php include 'views/layout/footer.php'; ?>
