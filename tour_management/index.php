@@ -72,6 +72,8 @@ $routes = [
     'tour_request_store'    => ['TourRequest', 'store', true],
     'tour_request_index'    => ['TourRequest', 'index', true],
     'tour_request_show'     => ['TourRequest', 'show', true],
+    'tour_request_destroy' => ['TourRequest', 'destroy', true],
+
 
     // ===== BOOKING =====
     'booking_index'         => ['Booking', 'index', true],

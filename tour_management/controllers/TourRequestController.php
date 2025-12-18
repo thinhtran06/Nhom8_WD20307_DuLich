@@ -108,14 +108,22 @@ class TourRequestController
      */
     public function destroy($id)
     {
+        // CHẶN GET – tránh redirect loop
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: index.php?action=tour_request_index");
+            exit();
+        }
+
         $this->request->id = $id;
+
         if ($this->request->delete()) {
-            header("Location: index.php?action=tour_request_index&message=Đã xóa yêu cầu ID " . htmlspecialchars($id) . ".");
+            header("Location: index.php?action=tour_request_index&message=Đã xóa yêu cầu thành công");
         } else {
-            header("Location: index.php?action=tour_request_index&message=Lỗi khi xóa yêu cầu ID " . htmlspecialchars($id) . ".");
+            header("Location: index.php?action=tour_request_index&message=Lỗi khi xóa yêu cầu");
         }
         exit();
     }
+
     
     // ------------------------------------------------------------------
     ## Chức năng hỗ trợ (Tùy chọn)
