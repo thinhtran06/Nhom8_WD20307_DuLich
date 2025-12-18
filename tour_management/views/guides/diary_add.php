@@ -1,58 +1,33 @@
 <?php include "views/layout/header.php"; ?>
 
-<?php
-// Lấy tour_id, guide_id từ URL
-$tour_id  = (int)($_GET['tour_id'] ?? 0);
-$guide_id = (int)($_GET['guide_id'] ?? 0);
-?>
+<div style="margin-left:260px; margin-top:80px; padding:20px;">
+    <div class="card shadow-sm border-0" style="border-radius: 15px;">
+        <div class="card-header bg-white py-3">
+            <h5 class="fw-bold mb-0 text-success"><i class="fas fa-pen-nib me-2"></i>Viết Nhật ký đoàn: #<?= htmlspecialchars($_GET['booking_id']) ?></h5>
+        </div>
+        <div class="card-body">
+            <form action="index.php?action=guide_diary_store" method="POST">
+                <input type="hidden" name="booking_id" value="<?= htmlspecialchars($_GET['booking_id']) ?>">
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tiêu đề (Ví dụ: Ngày 1 - Đón khách tại sân bay)</label>
+                    <input type="text" name="tieu_de" class="form-control" placeholder="Nhập tiêu đề nhật ký..." required>
+                </div>
 
-<h3>📝 Thêm nhật ký tour</h3>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Nội dung chi tiết</label>
+                    <textarea name="noi_dung" class="form-control" rows="8" placeholder="Ghi chú các sự việc xảy ra, tình trạng đoàn khách..." required></textarea>
+                </div>
 
-<form action="index.php?action=guide_diary_store" method="POST">
-
-    <input type="hidden" name="tour_id" value="<?= $tour_id ?>">
-    <input type="hidden" name="guide_id" value="<?= $guide_id ?>">
-
-    <div class="mb-3">
-        <label class="form-label">Ngày</label>
-        <input type="date" name="ngay" class="form-control" required>
+                <div class="text-end">
+                    <a href="javascript:history.back()" class="btn btn-light border">Hủy bỏ</a>
+                    <button type="submit" class="btn btn-success px-4">
+                        <i class="fas fa-save"></i> Lưu nhật ký
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label class="form-label">Tiêu đề</label>
-        <input type="text" name="tieu_de" class="form-control" required>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Nội dung</label>
-        <textarea name="noi_dung" class="form-control" rows="4" required></textarea>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Sự cố (nếu có)</label>
-        <textarea name="su_co" class="form-control" rows="3"></textarea>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Phản hồi khách</label>
-        <textarea name="phan_hoi_khach" class="form-control" rows="3"></textarea>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Cách xử lý</label>
-        <textarea name="cach_xu_ly" class="form-control" rows="3"></textarea>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Hình ảnh (tên file / đường dẫn - nếu dùng)</label>
-        <input type="text" name="hinh_anh" class="form-control">
-    </div>
-
-    <button class="btn btn-success">Lưu nhật ký</button>
-    <a href="index.php?action=guide_diary&tour_id=<?= $tour_id ?>&guide_id=<?= $guide_id ?>"
-       class="btn btn-secondary ms-2">
-        Quay lại
-    </a>
-</form>
+</div>
 
 <?php include "views/layout/footer.php"; ?>

@@ -1,39 +1,12 @@
 <?php
-
 class Guide {
-
     private $conn;
     private $table = "guides";
-
-    // ✅ Khai báo đầy đủ thuộc tính (tránh lỗi deprecated PHP 8.2)
-    public $id;
-    public $ho_ten;
-    public $loai_hdv;
-    public $chuyen_tuyen;
-    public $ngon_ngu;
-    public $so_dien_thoai;
-    public $email;
-    public $dia_chi;
-    public $trang_thai;
 
     public function __construct($db) {
         $this->conn = $db;
     }
 
-    /* ============================
-       LẤY HDV THEO ID (CHUẨN)
-    ============================ */
-    public function getById($id) {
-    $query = "SELECT * FROM " . $this->table . " WHERE id = ? LIMIT 1";
-    $stmt = $this->conn->prepare($query);
-    $stmt->bindParam(1, $id, PDO::PARAM_INT);
-    $stmt->execute();
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
-    /* ============================
-       LẤY TẤT CẢ HDV
-    ============================ */
     public function getAll() {
         $query = "SELECT * FROM " . $this->table . " ORDER BY id DESC";
         $stmt = $this->conn->prepare($query);
@@ -41,78 +14,97 @@ class Guide {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /* ============================
-       TẠO HDV MỚI
-    ============================ */
+    public function getById($id) {
+        $query = "SELECT * FROM " . $this->table . " WHERE id = ? LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function create($data) {
-    $query = "INSERT INTO " . $this->table . " 
-              (ho_ten, ngay_sinh, gioi_tinh, dien_thoai, email, trang_thai, dia_chi, ngon_ngu, loai_hdv, chuyen_tuyen, ghi_chu)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $query = "INSERT INTO " . $this->table . " 
+                  (ho_ten, ngay_sinh, gioi_tinh, dien_thoai, email, dia_chi, anh_dai_dien, ngon_ngu, kinh_nghiem, ghi_chu, trang_thai)
+                  VALUES (:ho_ten, :ngay_sinh, :gioi_tinh, :dien_thoai, :email, :dia_chi, :anh_dai_dien, :ngon_ngu, :kinh_nghiem, :ghi_chu, :trang_thai)";
 
-    $stmt = $this->conn->prepare($query);
+        $stmt = $this->conn->prepare($query);
 
-    return $stmt->execute([
-        $data['ho_ten'],
-        $data['ngay_sinh'],
-        $data['gioi_tinh'],
-        $data['dien_thoai'],
-        $data['email'],
-        $data['trang_thai'],
-        $data['dia_chi'],
-        $data['ngon_ngu'],
-        $data['loai_hdv'],
-        $data['chuyen_tuyen'],
-        $data['ghi_chu']
-    ]);
-}
+        return $stmt->execute([
+            ':ho_ten'       => $data['ho_ten'],
+            ':ngay_sinh'    => !empty($data['ngay_sinh']) ? $data['ngay_sinh'] : null,
+            ':gioi_tinh'    => $data['gioi_tinh'] ?? 'Nam',
+            ':dien_thoai'   => $data['dien_thoai'],
+            ':email'        => $data['email'],
+            ':dia_chi'      => $data['dia_chi'],
+            ':anh_dai_dien' => $data['anh_dai_dien'] ?? null,
+            ':ngon_ngu'     => $data['ngon_ngu'],
+            ':kinh_nghiem'  => !empty($data['kinh_nghiem']) ? intval($data['kinh_nghiem']) : 0,
+            ':ghi_chu'      => $data['ghi_chu'],
+            ':trang_thai'   => $data['trang_thai'] ?? 'Đang hoạt động'
+        ]);
+    }
 
-    /* ============================
-       CẬP NHẬT HDV
-    ============================ */
-    public function update($data) {
-    $query = "UPDATE " . $this->table . "
-              SET ho_ten=?, ngay_sinh=?, gioi_tinh=?, dien_thoai=?, email=?, trang_thai=?, dia_chi=?, ngon_ngu=?, loai_hdv=?, chuyen_tuyen=?, ghi_chu=?
-              WHERE id=?";
+    public function update($id, $data) {
+        $query = "UPDATE " . $this->table . "
+                  SET ho_ten=:ho_ten, ngay_sinh=:ngay_sinh, gioi_tinh=:gioi_tinh, 
+                      dien_thoai=:dien_thoai, email=:email, dia_chi=:dia_chi, 
+                      anh_dai_dien=:anh_dai_dien, ngon_ngu=:ngon_ngu, 
+                      kinh_nghiem=:kinh_nghiem, ghi_chu=:ghi_chu, trang_thai=:trang_thai
+                  WHERE id=:id";
 
-    $stmt = $this->conn->prepare($query);
+        $stmt = $this->conn->prepare($query);
+        
+        return $stmt->execute([
+            ':ho_ten'       => $data['ho_ten'],
+            ':ngay_sinh'    => !empty($data['ngay_sinh']) ? $data['ngay_sinh'] : null,
+            ':gioi_tinh'    => $data['gioi_tinh'],
+            ':dien_thoai'   => $data['dien_thoai'],
+            ':email'        => $data['email'],
+            ':dia_chi'      => $data['dia_chi'],
+            ':anh_dai_dien' => $data['anh_dai_dien'] ?? null,
+            ':ngon_ngu'     => $data['ngon_ngu'],
+            ':kinh_nghiem'  => intval($data['kinh_nghiem']),
+            ':ghi_chu'      => $data['ghi_chu'],
+            ':trang_thai'   => $data['trang_thai'],
+            ':id'           => $id
+        ]);
+    }
 
-    return $stmt->execute([
-        $data['ho_ten'],
-        $data['ngay_sinh'],
-        $data['gioi_tinh'],
-        $data['dien_thoai'],
-        $data['email'],
-        $data['trang_thai'],
-        $data['dia_chi'],
-        $data['ngon_ngu'],
-        $data['loai_hdv'],
-        $data['chuyen_tuyen'],
-        $data['ghi_chu'],
-        $data['id']
-    ]);
-}
+    public function store($data) {
+        if (isset($data['id']) && !empty($data['id'])) {
+            return $this->update($data['id'], $data);
+        }
+        return $this->create($data);
+    }
 
-    /* ============================
-       XÓA HDV
-    ============================ */
     public function delete($id) {
         $query = "DELETE FROM " . $this->table . " WHERE id = ?";
-        $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$id]);
+        return $this->conn->prepare($query)->execute([$id]);
     }
-    /* ============================
-   STORE = CREATE + UPDATE
-============================ */
-public function store($data) {
-    // Nếu có ID → cập nhật
-    if (!empty($data['id'])) {
-        return $this->update($data);
-    }
-
-    // Nếu không có ID → thêm mới
-    return $this->create($data);
+    /* ==================================
+   LẤY LỊCH LÀM VIỆC (BOOKING) CỦA HDV
+================================== */
+/* ==================================
+   LẤY LỊCH LÀM VIỆC (BOOKING) CỦA HDV
+================================== */
+public function getSchedule($guide_id) {
+    // Thêm b.id và t.id AS tour_id vào SELECT
+    $query = "SELECT 
+                b.id, 
+                b.ma_dat_tour, 
+                b.trang_thai, 
+                b.ngay_dat, 
+                b.tour_id,
+                t.ten_tour, 
+                c.ho_ten AS ten_khach
+              FROM bookings b
+              LEFT JOIN tours t ON b.tour_id = t.id
+              LEFT JOIN customers c ON b.customer_id = c.id
+              WHERE b.guide_id = ? 
+              ORDER BY b.ngay_dat DESC";
+    
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute([$guide_id]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 }
-
-?>

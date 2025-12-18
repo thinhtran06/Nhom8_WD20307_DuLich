@@ -1,174 +1,47 @@
 <?php
 class GuideDiaryController {
-
     private $conn;
 
-    public function __construct($db){
+    public function __construct($db) {
         $this->conn = $db;
     }
 
-    /* ============================
-       DANH SÁCH NHẬT KÝ THEO TOUR + GUIDE
-    ============================ */
-    public function index(){
-
-    if (!isset($_GET['tour_id'], $_GET['guide_id'])) {
-        die("Thiếu tour_id hoặc guide_id");
+    // Hiển thị danh sách nhật ký
+    public function index() {
+        $booking_id = $_GET['booking_id'] ?? null;
+        $query = "SELECT * FROM guide_diaries WHERE booking_id = ? ORDER BY created_at DESC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([$booking_id]);
+        $diaries = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        include "views/guides/diary.php";
     }
 
-    $tour_id  = (int)$_GET['tour_id'];
-    $guide_id = (int)$_GET['guide_id'];
-
-    // 🔒 CHẶN NGAY TỪ ĐẦU
-    if ($guide_id <= 0) {
-        die("Guide không hợp lệ");
+    // Hiển thị form thêm
+    public function add() {
+        include "views/guides/diary_add.php";
     }
 
-    require_once "models/Tour.php";
-    require_once "models/Guide.php";
-    require_once "models/GuideDiary.php";
+    // Lưu vào database
+    public function save() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $booking_id = $_POST['booking_id'];
+            $tieu_de = $_POST['tieu_de'];
+            $noi_dung = $_POST['noi_dung'];
+            $user_id = $_SESSION['user_id'] ?? null; // Nếu có đăng nhập
 
-    // Tour
-    $tourModel = new Tour($this->conn);
-    $tour = $tourModel->getById($tour_id);
+            $query = "INSERT INTO guide_diaries (booking_id, user_id, tieu_de, noi_dung, created_at) 
+                      VALUES (:booking_id, :user_id, :tieu_de, :noi_dung, NOW())";
+            
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([
+                ':booking_id' => $booking_id,
+                ':user_id'    => $user_id,
+                ':tieu_de'    => $tieu_de,
+                ':noi_dung'   => $noi_dung
+            ]);
 
-    // Guide
-    $guideModel = new Guide($this->conn);
-    $guide = $guideModel->getById($guide_id);
-
-    // Diary
-    $diaryModel = new GuideDiary($this->conn);
-    $diaries = $diaryModel->getByTourAndGuide($tour_id, $guide_id);
-
-    include "views/guides/diary_list.php";
-}
-
-
-    /* ============================
-       FORM THÊM NHẬT KÝ
-    ============================ */
-    public function add(){
-
-        if (!isset($_GET['tour_id'], $_GET['guide_id'])) {
-            die("Thiếu tour_id hoặc guide_id");
+            header("Location: index.php?action=guide_diary&booking_id=" . $booking_id);
+            exit;
         }
-
-        $tour_id  = (int)$_GET['tour_id'];
-        $guide_id = (int)$_GET['guide_id'];
-
-        $entry = null; // QUAN TRỌNG: thống nhất với form
-
-        include "views/guides/diary_form.php";
-    }
-
-    /* ============================
-       FORM SỬA NHẬT KÝ
-    ============================ */
-    public function edit(){
-
-        if (!isset($_GET['id'])) {
-            die("Thiếu id nhật ký");
-        }
-
-        require_once "models/GuideDiary.php";
-
-        $model = new GuideDiary($this->conn);
-        $entry = $model->getById((int)$_GET['id']);
-
-        if (!$entry) {
-            die("Nhật ký không tồn tại");
-        }
-
-        $tour_id  = $entry['tour_id'];
-        $guide_id = $entry['guide_id'];
-
-        include "views/guides/diary_form.php";
-    }
-
-    /* ============================
-       LƯU NHẬT KÝ (CREATE + UPDATE)
-    ============================ */
-    public function save(){
-
-        require_once "models/GuideDiary.php";
-
-        $data = [
-            "id"             => $_POST["id"] ?? null,
-            "tour_id"        => (int)$_POST["tour_id"],
-            "guide_id"       => (int)$_POST["guide_id"],
-            "ngay"           => $_POST["ngay"],
-            "tieu_de"        => $_POST["tieu_de"],
-            "noi_dung"       => $_POST["noi_dung"] ?? "",
-            "phan_hoi_khach" => $_POST["phan_hoi_khach"] ?? null,
-            "su_co"          => $_POST["su_co"] ?? null,
-            "cach_xu_ly"     => $_POST["cach_xu_ly"] ?? null,
-            "hinh_anh"       => null
-        ];
-
-        /* ===== Upload ảnh ===== */
-        $uploaded = [];
-
-        if (!empty($_FILES['hinh_anh']['name'][0])) {
-            foreach ($_FILES['hinh_anh']['tmp_name'] as $i => $tmp) {
-                if ($tmp) {
-                    $filename = time() . "_" . basename($_FILES['hinh_anh']['name'][$i]);
-                    move_uploaded_file($tmp, "uploads/diary/" . $filename);
-                    $uploaded[] = $filename;
-                }
-            }
-        }
-
-        $model = new GuideDiary($this->conn);
-
-        // Giữ ảnh cũ khi update
-        if (!empty($data["id"])) {
-            $old = $model->getById($data["id"]);
-            if (!empty($old['hinh_anh'])) {
-                $uploaded = array_merge(
-                    explode(",", $old['hinh_anh']),
-                    $uploaded
-                );
-            }
-        }
-
-        $data["hinh_anh"] = implode(",", $uploaded);
-
-        if (!empty($data["id"])) {
-            $model->update($data["id"], $data);
-        } else {
-            $model->create($data);
-        }
-
-        header(
-            "Location: index.php?action=guide_diary&tour_id={$data['tour_id']}&guide_id={$data['guide_id']}"
-        );
-        exit;
-    }
-
-    /* ============================
-       XOÁ NHẬT KÝ
-    ============================ */
-    public function delete(){
-
-        if (!isset($_GET['id'], $_GET['tour_id'], $_GET['guide_id'])) {
-            die("Thiếu tham số");
-        }
-
-        require_once "models/GuideDiary.php";
-
-        $id       = (int)$_GET['id'];
-        $tour_id  = (int)$_GET['tour_id'];
-        $guide_id = (int)$_GET['guide_id'];
-
-        $model = new GuideDiary($this->conn);
-
-        if (!$model->getById($id)) {
-            die("Nhật ký không tồn tại");
-        }
-
-        $model->delete($id);
-
-        header("Location: index.php?action=guide_diary&tour_id=$tour_id&guide_id=$guide_id");
-        exit;
     }
 }
